@@ -1,5 +1,7 @@
 // const { fontFamily } = require('tailwindcss/defaultTheme');
 
+const prometheus = require('./tailwind.prometheus');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -11,8 +13,9 @@ module.exports = {
   darkMode: ['class'],
   theme: {
     fontFamily: {
-      sans: ['Inter', 'sans-serif'],
+      sans: ['Roboto', 'Inter', 'sans-serif'],
       mono: ['Roboto Mono', 'monospace'],
+      heading: ['"Proxima Nova"', 'sans-serif'],
     },
     // fontFamily: {
     //   sans: ['Söhne', 'sans-serif'],
@@ -38,6 +41,20 @@ module.exports = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       colors: {
+        prometheus: {
+          navy: '#0A192D',
+          lightNavy: '#0F2440',
+          yellow: '#FFDD00',
+          orange: '#FF5500',
+          red: '#FF4D4D',
+          turquoise: '#00A3A3',
+          lightBlue: '#4D9FFF',
+          lavender: '#9D8DF1',
+          ultraLightGray: '#F8F8F8',
+          lightGray: '#F5F5F5',
+          mediumGray: '#CCCCCC',
+          darkGray: '#333333',
+        },
         gray: {
           20: '#ececf1',
           50: '#f7f7f8',

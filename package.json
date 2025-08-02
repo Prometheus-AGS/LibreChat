@@ -1,7 +1,7 @@
 {
-  "name": "LibreChat",
+  "name": "Sage",
   "version": "v0.7.9",
-  "description": "",
+  "description": "Prometheus AGS AI Assistant",
   "workspaces": [
     "api",
     "client",
@@ -78,12 +78,12 @@
     "type": "git",
     "url": "git+https://github.com/danny-avila/LibreChat.git"
   },
-  "author": "",
+  "author": "Prometheus AGS",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/danny-avila/LibreChat/issues"
   },
-  "homepage": "https://librechat.ai/",
+  "homepage": "https://sage.prometheusags.ai/",
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
     "@eslint/compat": "^1.2.6",
