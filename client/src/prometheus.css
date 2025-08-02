@@ -1,0 +1,128 @@
+/* Prometheus AGS Brand Styles */
+
+/* Root CSS variables for light mode */
+:root {
+  /* Base colors */
+  --background: 0 0% 97%;
+  --foreground: 214 63% 10%;
+
+  /* Primary - Navy */
+  --primary: 214 64% 11%;
+  --primary-foreground: 0 0% 97%;
+
+  /* Secondary - Yellow */
+  --secondary: 52 100% 50%;
+  --secondary-foreground: 214 64% 11%;
+
+  /* Accent - Turquoise */
+  --accent: 180 100% 32%;
+  --accent-foreground: 0 0% 97%;
+
+  /* Destructive - Red */
+  --destructive: 0 100% 65%;
+  --destructive-foreground: 0 0% 97%;
+
+  /* Muted - Medium Gray */
+  --muted: 0 0% 80%;
+  --muted-foreground: 214 64% 11%;
+
+  /* Card and Popover - Ultra Light Gray */
+  --card: 0 0% 97%;
+  --card-foreground: 214 64% 11%;
+  --popover: 0 0% 97%;
+  --popover-foreground: 214 64% 11%;
+
+  /* Border, Input, Ring - Medium Gray */
+  --border: 0 0% 80%;
+  --input: 0 0% 80%;
+  --ring: 214 64% 11%;
+
+  --radius: 0.5rem;
+}
+
+/* Dark mode overrides */
+.dark {
+  /* Base colors */
+  --background: 214 64% 11%;
+  --foreground: 0 0% 97%;
+
+  /* Primary - Light Blue */
+  --primary: 213 100% 65%;
+  --primary-foreground: 214 64% 11%;
+
+  /* Secondary - Yellow */
+  --secondary: 52 100% 50%;
+  --secondary-foreground: 214 64% 11%;
+
+  /* Accent - Turquoise */
+  --accent: 180 100% 32%;
+  --accent-foreground: 214 64% 11%;
+
+  /* Destructive - Red */
+  --destructive: 0 100% 65%;
+  --destructive-foreground: 214 64% 11%;
+
+  /* Muted - Dark Gray */
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 80%;
+
+  /* Card and Popover - Slightly lighter Navy */
+  --card: 214 64% 15%;
+  --card-foreground: 0 0% 97%;
+  --popover: 214 64% 15%;
+  --popover-foreground: 0 0% 97%;
+
+  /* Border, Input, Ring - Dark Gray */
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 213 100% 65%;
+}
+
+/* Typography setup */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Proxima Nova', sans-serif;
+  font-weight: 700;
+  color: theme('colors.prometheus.navy');
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: white;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+/* Prometheus gradient utilities */
+.text-prometheus-gradient {
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-prometheus-gradient {
+  background: linear-gradient(to bottom, #ffdd00, #ff5500, #ff4d4d, #0a192d);
+}
+
+/* Custom form styling */
+.prometheus-input {
+  @apply bg-white dark:bg-prometheus-lightNavy px-3 py-2 rounded-md focus:outline-none focus:ring-0 border-0 shadow-sm;
+}
+
+.prometheus-input-error {
+  @apply prometheus-input ring-2 ring-prometheus-red;
+}
+
+.prometheus-input-label {
+  @apply text-sm font-medium text-prometheus-navy dark:text-prometheus-ultraLightGray mb-1 block;
+}
+
+.prometheus-input-hint {
+  @apply text-sm text-gray-500 dark:text-gray-400 mt-1;
+}
+
+.prometheus-input-error-message {
+  @apply text-sm text-prometheus-red mt-1;
+}

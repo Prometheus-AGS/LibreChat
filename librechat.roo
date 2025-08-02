@@ -1,0 +1,138 @@
+// LibreChat Roo Configuration Script
+// This script provides Roo commands for setting up a LibreChat-like application structure
+
+// Project setup
+project setup --topLevelPackage com.librechat --projectName LibreChat --java 17 --packaging JAR
+
+// JPA setup for MongoDB-like functionality
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+
+// Security setup (similar to Passport.js authentication)
+security setup
+
+// Web MVC setup (similar to Express.js routes)
+web mvc setup
+
+// Create core entities based on LibreChat architecture
+
+// User entity (for authentication and user management)
+entity jpa --class ~.domain.User --activeRecord false
+field string --fieldName username --notNull --unique
+field string --fieldName email --notNull --unique
+field string --fieldName password --notNull
+field string --fieldName firstName
+field string --fieldName lastName
+field date --fieldName createdAt --type java.util.Date --notNull
+field date --fieldName updatedAt --type java.util.Date
+field boolean --fieldName isActive --value true
+field enum --fieldName role --type ~.domain.UserRole
+
+// UserRole enum
+enum type --class ~.domain.UserRole
+enum constant --name USER
+enum constant --name ADMIN
+enum constant --name MODERATOR
+
+// Conversation entity (for chat functionality)
+entity jpa --class ~.domain.Conversation --activeRecord false
+field string --fieldName title
+field date --fieldName createdAt --type java.util.Date --notNull
+field date --fieldName updatedAt --type java.util.Date
+field reference --fieldName user --type ~.domain.User --notNull
+
+// Message entity (for individual chat messages)
+entity jpa --class ~.domain.Message --activeRecord false
+field string --fieldName content --sizeMax 10000 --notNull
+field date --fieldName createdAt --type java.util.Date --notNull
+field reference --fieldName conversation --type ~.domain.Conversation --notNull
+field reference --fieldName user --type ~.domain.User --notNull
+field enum --fieldName messageType --type ~.domain.MessageType
+
+// MessageType enum
+enum type --class ~.domain.MessageType
+enum constant --name USER
+enum constant --name ASSISTANT
+enum constant --name SYSTEM
+
+// AIProvider entity (for managing different AI providers)
+entity jpa --class ~.domain.AIProvider --activeRecord false
+field string --fieldName name --notNull --unique
+field string --fieldName apiKey
+field string --fieldName baseUrl
+field boolean --fieldName isActive --value true
+field enum --fieldName providerType --type ~.domain.ProviderType
+
+// ProviderType enum
+enum type --class ~.domain.ProviderType
+enum constant --name OPENAI
+enum constant --name ANTHROPIC
+enum constant --name GOOGLE
+enum constant --name CUSTOM
+
+// File entity (for file handling)
+entity jpa --class ~.domain.File --activeRecord false
+field string --fieldName filename --notNull
+field string --fieldName originalName --notNull
+field string --fieldName mimeType
+field number --fieldName size --type java.lang.Long
+field string --fieldName path --notNull
+field date --fieldName uploadedAt --type java.util.Date --notNull
+field reference --fieldName uploadedBy --type ~.domain.User --notNull
+
+// Create repositories for all entities
+repository jpa --interface ~.repository.UserRepository --entity ~.domain.User
+repository jpa --interface ~.repository.ConversationRepository --entity ~.domain.Conversation
+repository jpa --interface ~.repository.MessageRepository --entity ~.domain.Message
+repository jpa --interface ~.repository.AIProviderRepository --entity ~.domain.AIProvider
+repository jpa --interface ~.repository.FileRepository --entity ~.domain.File
+
+// Create services (similar to LibreChat services)
+service --interface ~.service.UserService --entity ~.domain.User
+service --interface ~.service.ConversationService --entity ~.domain.Conversation
+service --interface ~.service.MessageService --entity ~.domain.Message
+service --interface ~.service.AIProviderService --entity ~.domain.AIProvider
+service --interface ~.service.FileService --entity ~.domain.File
+
+// Create web controllers (similar to Express.js routes)
+web mvc controller --class ~.web.UserController --entity ~.domain.User
+web mvc controller --class ~.web.ConversationController --entity ~.domain.Conversation
+web mvc controller --class ~.web.MessageController --entity ~.domain.Message
+web mvc controller --class ~.web.AIProviderController --entity ~.domain.AIProvider
+web mvc controller --class ~.web.FileController --entity ~.domain.File
+
+// Add JSON support for REST APIs
+web mvc json setup
+web mvc json add --class ~.domain.User
+web mvc json add --class ~.domain.Conversation
+web mvc json add --class ~.domain.Message
+web mvc json add --class ~.domain.AIProvider
+web mvc json add --class ~.domain.File
+
+// Add finders for common queries
+finder add --finderName findUsersByEmail --class ~.domain.User
+finder add --finderName findUsersByUsernameEquals --class ~.domain.User
+finder add --finderName findConversationsByUser --class ~.domain.Conversation
+finder add --finderName findMessagesByConversation --class ~.domain.Message
+finder add --finderName findMessagesByUser --class ~.domain.Message
+finder add --finderName findAIProvidersByIsActiveEquals --class ~.domain.AIProvider
+finder add --finderName findFilesByUploadedBy --class ~.domain.File
+
+// Add validation
+field string --fieldName email --class ~.domain.User --regexp "^[A-Za-z0-9+_.-]+@(.+)$"
+
+// Add logging
+logging setup --level INFO
+
+// Add testing support
+test integration --entity ~.domain.User
+test integration --entity ~.domain.Conversation
+test integration --entity ~.domain.Message
+test integration --entity ~.domain.AIProvider
+test integration --entity ~.domain.File
+
+// Add Selenium tests for web layer
+selenium test --controller ~.web.UserController
+selenium test --controller ~.web.ConversationController
+
+// Perform final setup
+perform package

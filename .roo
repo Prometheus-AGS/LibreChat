@@ -1,0 +1,63 @@
+# LibreChat Roo Configuration
+# This file contains Roo-specific configuration and hints for the LibreChat project
+
+# Project metadata
+project.name=LibreChat
+project.topLevelPackage=com.librechat
+project.java.version=17
+
+# Database configuration (similar to MongoDB setup in LibreChat)
+database.provider=HIBERNATE
+database.type=HYPERSONIC_IN_MEMORY
+
+# Web configuration (similar to Express.js setup)
+web.mvc.enabled=true
+web.json.enabled=true
+
+# Security configuration (similar to Passport.js)
+security.enabled=true
+
+# Development commands mapping (based on CLAUDE.md)
+# These are Roo equivalents of the npm commands
+
+# Setup and Installation equivalent
+# roo> project setup --topLevelPackage com.librechat --projectName LibreChat
+
+# Backend Development equivalent  
+# roo> perform package
+# roo> web mvc embedded --port 3080
+
+# Build Commands equivalent
+# roo> perform clean compile
+# roo> perform package
+
+# Testing equivalent
+# roo> test integration
+# roo> selenium test
+
+# Code Quality equivalent
+# roo> logging setup --level DEBUG
+
+# Architecture mapping:
+# Express.js routes -> Spring MVC Controllers
+# MongoDB models -> JPA Entities
+# Passport.js auth -> Spring Security
+# Node.js services -> Spring Services
+# Middleware -> Spring Interceptors
+
+# Key Roo commands for LibreChat-like functionality:
+# entity jpa - Creates domain objects (similar to Mongoose models)
+# repository jpa - Creates data access layer
+# service - Creates business logic layer (similar to LibreChat services)
+# web mvc controller - Creates REST endpoints (similar to Express routes)
+# security setup - Configures authentication (similar to Passport.js)
+# web mvc json - Enables JSON REST APIs
+# finder add - Creates custom queries
+# test integration - Creates automated tests
+
+# File structure mapping:
+# /api -> /src/main/java/com/librechat
+# /client -> /src/main/webapp
+# /models -> /src/main/java/com/librechat/domain
+# /routes -> /src/main/java/com/librechat/web
+# /services -> /src/main/java/com/librechat/service
