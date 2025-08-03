@@ -87,10 +87,57 @@ async function hasCustomUserVars() {
   return Object.values(mcpServers ?? {}).some((server) => server.customUserVars);
 }
 
+/**
+ * Retrieves the artifact configuration object
+ * @function getArtifactConfig
+ * @returns {Promise<TCustomConfig['artifacts'] | null>}
+ */
+async function getArtifactConfig() {
+  const customConfig = await getCustomConfig();
+  if (!customConfig) {
+    // Return default configuration if no custom config exists
+    return {
+      enabled: true,
+      sharedConversations: {
+        allowAnonymousPreview: true,
+        requireAuthentication: false,
+        previewMaxLength: 5000,
+        showLoginPrompt: true,
+      },
+      processing: {
+        enableSyntaxHighlighting: true,
+        enableHtmlPreviews: true,
+        sanitizeHtml: true,
+        maxFileSize: 1048576,
+      },
+    };
+  }
+
+  // Return configured artifacts settings with defaults for missing values
+  const artifactConfig = customConfig.artifacts || {};
+  return {
+    enabled: artifactConfig.enabled ?? true,
+    sharedConversations: {
+      allowAnonymousPreview: artifactConfig.sharedConversations?.allowAnonymousPreview ?? true,
+      requireAuthentication: artifactConfig.sharedConversations?.requireAuthentication ?? false,
+      previewMaxLength: artifactConfig.sharedConversations?.previewMaxLength ?? 5000,
+      showLoginPrompt: artifactConfig.sharedConversations?.showLoginPrompt ?? true,
+      anonymousMessage: artifactConfig.sharedConversations?.anonymousMessage,
+    },
+    processing: {
+      enableSyntaxHighlighting: artifactConfig.processing?.enableSyntaxHighlighting ?? true,
+      enableHtmlPreviews: artifactConfig.processing?.enableHtmlPreviews ?? true,
+      sanitizeHtml: artifactConfig.processing?.sanitizeHtml ?? true,
+      maxFileSize: artifactConfig.processing?.maxFileSize ?? 1048576,
+    },
+  };
+}
+
 module.exports = {
   getMCPAuthMap,
   getCustomConfig,
   getBalanceConfig,
+  getArtifactConfig,
   hasCustomUserVars,
   getCustomEndpointConfig,
 };

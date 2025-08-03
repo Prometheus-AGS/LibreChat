@@ -1,6 +1,6 @@
-# CLINERULES
+# QWEN.md
 
-This file provides guidance to Cline when working with code in this repository.
+This file provides guidance to Qwen Code when working with code in this repository.
 
 ## Common Development Commands
 
@@ -140,7 +140,7 @@ LibreChat is a full-stack JavaScript/TypeScript application with a monorepo stru
   - **Services**: Core functionality implementations (`api/server/services/`)
   - **Models**: MongoDB schemas and database operations (`api/models/`)
   - **Clients**: Integration with AI providers (`api/app/clients/`)
-    - OpenAI, Anthropic, Google, etc.
+    - OpenAI, Anthropic, Google, Qwen, etc.
   - **Middleware**: Request processing, auth, validation (`api/server/middleware/`)
 
 ### Frontend (Client)
@@ -165,7 +165,7 @@ LibreChat is a full-stack JavaScript/TypeScript application with a monorepo stru
 
 ### Key Features Architecture
 1. **AI Model Integration**:
-   - Multiple AI providers (OpenAI, Claude, Google, etc.)
+   - Multiple AI providers (OpenAI, Claude, Google, Qwen, etc.)
    - Custom endpoints for self-hosted models
    - Streaming responses
 
@@ -239,34 +239,16 @@ LibreChat is a full-stack JavaScript/TypeScript application with a monorepo stru
   /data-schemas   - Database schemas
 ```
 
-## Enhanced Development Rules
-
-### Rule 1: Post-Bug Resolution Memory Creation
-**WHEN**: Immediately after successfully fixing any bug that resulted in zero errors/warnings
-**ACTION**: Use the memory MCP server to create a detailed memory entry containing:
-- Specific error symptoms encountered
-- Root cause identified
-- Exact solution implemented
-- Files modified and key changes made
-- Testing approach used to verify the fix
-
-**PURPOSE**: Prevent recurring similar issues and accelerate future debugging by building institutional knowledge
-
-**EXAMPLE MEMORY TITLE**: "Fixed [Component] [Error Type]: [Brief Description]"
-
-### Rule 2: Pre-Development Context Research
-**WHEN**: Before implementing any new feature or bug fix
-**ACTION**: Query the memory MCP server to search for:
-- Similar bugs previously encountered and resolved
-- Related features already implemented
-- Architectural patterns used for comparable functionality
-- Known pitfalls or considerations for the specific area of code
-
-**PURPOSE**: Leverage existing knowledge to avoid repeating mistakes, maintain consistency, and accelerate development
-
-**SEARCH STRATEGY**: Use specific keywords related to the component, error type, or feature being developed
-
 ## Documentation Guidelines
 
 - The `docs` subdirectory is where all specs are
 - Always follow the branding guide in the `docs/prometheus` directory for styling and branding
+
+## Qwen-Specific Notes
+
+This project supports Qwen AI models through the AI provider integration system. When working with Qwen-related code:
+
+- Qwen models are integrated through the AI provider system in `api/app/clients/`
+- Configuration for Qwen endpoints can be found in the `librechat.yaml` configuration file
+- The frontend supports Qwen model selection through the model dropdown interface
+- Qwen models support streaming responses and conversation history like other AI providers

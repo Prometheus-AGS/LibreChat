@@ -1,11 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { useLocation } from 'react-router-dom';
 import * as Tabs from '@radix-ui/react-tabs';
-import { ArrowLeft, ChevronLeft, ChevronRight, RefreshCw, X } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, RefreshCw, X, Lock } from 'lucide-react';
 import type { SandpackPreviewRef, CodeEditorRef } from '@codesandbox/sandpack-react';
 import useArtifacts from '~/hooks/Artifacts/useArtifacts';
 import DownloadArtifact from './DownloadArtifact';
-import { useEditorContext } from '~/Providers';
+import StaticArtifactPreview from './StaticArtifactPreview';
+import { useEditorContext, useShareContext } from '~/Providers';
 import ArtifactTabs from './ArtifactTabs';
 import { CopyCodeButton } from './Code';
 import { useLocalize } from '~/hooks';
@@ -13,7 +15,9 @@ import store from '~/store';
 
 export default function Artifacts() {
   const localize = useLocalize();
+  const location = useLocation();
   const { isMutating } = useEditorContext();
+  const { isSharedConvo, artifactMode, canInteractWithArtifacts } = useShareContext();
   const editorRef = useRef<CodeEditorRef>();
   const previewRef = useRef<SandpackPreviewRef>();
   const [isVisible, setIsVisible] = useState(false);
@@ -39,7 +43,17 @@ export default function Artifacts() {
     return null;
   }
 
+  // Check if we're in a shared conversation without interactive access
+  // For shared conversations: show static preview if not authenticated or can't interact
+  // For authenticated users: show interactive view if they can interact, otherwise static preview
+  const isSharedReadOnly = isSharedConvo && !canInteractWithArtifacts;
+
   const handleRefresh = () => {
+    // Don't allow refresh in read-only mode
+    if (isSharedReadOnly) {
+      return;
+    }
+
     setIsRefreshing(true);
     const client = previewRef.current?.getClient();
     if (client != null) {
@@ -53,6 +67,72 @@ export default function Artifacts() {
     setTimeout(() => setArtifactsVisible(false), 300);
   };
 
+  const handleLoginPrompt = () => {
+    // Redirect to login with return URL
+    const currentUrl = encodeURIComponent(window.location.href);
+    window.location.href = `/login?return=${currentUrl}`;
+  };
+
+  // For shared conversations without interactive access, show static preview
+  if (isSharedReadOnly) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="flex h-full w-full flex-col overflow-hidden border border-border-medium bg-surface-primary text-xl text-text-primary shadow-xl">
+          {/* Header with close button only */}
+          <div className="flex items-center justify-between border-b border-border-medium bg-surface-primary-alt p-2">
+            <div className="flex items-center">
+              <button
+                className="mr-2 text-text-secondary"
+                onClick={closeArtifacts}
+                title="Close artifacts"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex items-center">
+              <button
+                className="text-text-secondary"
+                onClick={closeArtifacts}
+                title="Close artifacts"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Static preview content - this handles its own header, content, and footer */}
+          <div className="flex-1 overflow-hidden">
+            <StaticArtifactPreview artifact={currentArtifact} onLoginPrompt={handleLoginPrompt} />
+          </div>
+
+          {/* Footer with navigation only */}
+          <div className="flex items-center justify-center border-t border-border-medium bg-surface-primary-alt p-2 text-sm text-text-secondary">
+            <div className="flex items-center">
+              <button
+                onClick={() => cycleArtifact('prev')}
+                className="mr-2 text-text-secondary"
+                disabled={orderedArtifactIds.length <= 1}
+                title="Previous artifact"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="text-xs">{`${currentIndex + 1} / ${orderedArtifactIds.length}`}</span>
+              <button
+                onClick={() => cycleArtifact('next')}
+                className="ml-2 text-text-secondary"
+                disabled={orderedArtifactIds.length <= 1}
+                title="Next artifact"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular interactive artifacts view for authenticated users or regular conversations
   return (
     <Tabs.Root value={activeTab} onValueChange={setActiveTab} asChild>
       {/* Main Parent */}
@@ -66,10 +146,20 @@ export default function Artifacts() {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border-medium bg-surface-primary-alt p-2">
             <div className="flex items-center">
-              <button className="mr-2 text-text-secondary" onClick={closeArtifacts}>
+              <button
+                className="mr-2 text-text-secondary"
+                onClick={closeArtifacts}
+                title="Close artifacts"
+              >
                 <ArrowLeft className="h-4 w-4" />
               </button>
               <h3 className="truncate text-sm text-text-primary">{currentArtifact.title}</h3>
+              {/* Show interactive badge for authenticated shared conversations */}
+              {isSharedConvo && canInteractWithArtifacts && artifactMode === 'interactive' && (
+                <div className="ml-2 rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+                  {'Interactive'}
+                </div>
+              )}
             </div>
             <div className="flex items-center">
               {/* Refresh button */}
@@ -107,7 +197,11 @@ export default function Artifacts() {
                   {localize('com_ui_code')}
                 </Tabs.Trigger>
               </Tabs.List>
-              <button className="text-text-secondary" onClick={closeArtifacts}>
+              <button
+                className="text-text-secondary"
+                onClick={closeArtifacts}
+                title="Close artifacts"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -123,13 +217,21 @@ export default function Artifacts() {
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-border-medium bg-surface-primary-alt p-2 text-sm text-text-secondary">
             <div className="flex items-center">
-              <button onClick={() => cycleArtifact('prev')} className="mr-2 text-text-secondary">
+              <button
+                onClick={() => cycleArtifact('prev')}
+                className="mr-2 text-text-secondary"
+                title="Previous artifact"
+              >
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="text-xs">{`${currentIndex + 1} / ${
                 orderedArtifactIds.length
               }`}</span>
-              <button onClick={() => cycleArtifact('next')} className="ml-2 text-text-secondary">
+              <button
+                onClick={() => cycleArtifact('next')}
+                className="ml-2 text-text-secondary"
+                title="Next artifact"
+              >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>

@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import { Spinner } from '@librechat/client';
 import { useParams } from 'react-router-dom';
 import { useGetSharedMessages } from 'librechat-data-provider/react-query';
 import { useLocalize, useDocumentTitle } from '~/hooks';
@@ -8,13 +7,21 @@ import { ShareContext } from '~/Providers';
 import MessagesView from './MessagesView';
 import { buildTree } from '~/utils';
 import Footer from '../Chat/Footer';
+import type { TMessage } from 'librechat-data-provider';
 
-function SharedView() {
+// Create a simple Spinner component since @librechat/client import is not working
+const Spinner = ({ className = '' }: { className?: string }) => (
+  <div
+    className={`h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900 ${className}`}
+  ></div>
+);
+
+function ShareView() {
   const localize = useLocalize();
   const { data: config } = useGetStartupConfig();
-  const { shareId } = useParams();
+  const { shareId } = useParams<{ shareId: string }>();
   const { data, isLoading } = useGetSharedMessages(shareId ?? '');
-  const dataTree = data && buildTree({ messages: data.messages });
+  const dataTree = data && buildTree({ messages: data.messages as TMessage[] });
   const messagesTree = dataTree?.length === 0 ? null : (dataTree ?? null);
 
   // configure document title
@@ -60,7 +67,17 @@ function SharedView() {
   }
 
   return (
-    <ShareContext.Provider value={{ isSharedConvo: true }}>
+    <ShareContext.Provider
+      value={{
+        isSharedConvo: true,
+        isAuthenticated: (data as any)?.authContext?.isAuthenticated ?? false,
+        artifactMode: (data as any)?.authContext?.artifactMode ?? 'static',
+        canViewArtifacts: true, // Always allow viewing artifacts in shared conversations
+        canInteractWithArtifacts: (data as any)?.authContext?.canInteractWithArtifacts ?? false,
+        artifactConfig: config?.artifactConfig,
+        sharedArtifacts: null, // Will be populated by artifacts if present
+      }}
+    >
       <main
         className="relative flex w-full grow overflow-hidden dark:bg-surface-secondary"
         style={{ paddingBottom: '50px' }}
@@ -78,4 +95,4 @@ function SharedView() {
   );
 }
 
-export default memo(SharedView);
+export default memo(ShareView);
