@@ -147,7 +147,8 @@ export default function StaticArtifactPreview({
     } else {
       // Default behavior: redirect to login with return URL
       const currentUrl = encodeURIComponent(window.location.href);
-      window.location.href = `/login?return=${currentUrl}`;
+      // Use replace to avoid adding to history stack
+      window.location.replace(`/login?return=${currentUrl}`);
     }
   };
 

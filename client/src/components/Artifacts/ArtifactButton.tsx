@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { useLocation } from 'react-router-dom';
 import { useRecoilState, useSetRecoilState, useResetRecoilState } from 'recoil';
@@ -37,9 +37,9 @@ const ArtifactButton = ({ artifact }: { artifact: Artifact | null }) => {
   );
 
   // Check if current path supports artifacts (both regular and shared conversations)
-  const isArtifactSupportedPath = () => {
+  const isArtifactSupportedPath = useCallback(() => {
     return location.pathname.includes('/c/') || location.pathname.includes('/share/');
-  };
+  }, [location.pathname]);
 
   useEffect(() => {
     if (artifact == null || artifact?.id == null || artifact.id === '') {
@@ -59,7 +59,13 @@ const ArtifactButton = ({ artifact }: { artifact: Artifact | null }) => {
         debouncedSetVisible.cancel();
       };
     }
-  }, [artifact, location.pathname, isSharedConvo, canInteractWithArtifacts]);
+  }, [
+    artifact,
+    location.pathname,
+    isSharedConvo,
+    canInteractWithArtifacts,
+    isArtifactSupportedPath,
+  ]);
 
   const handleArtifactClick = () => {
     if (!artifact) {
@@ -70,9 +76,21 @@ const ArtifactButton = ({ artifact }: { artifact: Artifact | null }) => {
     if (location.pathname.includes('/c/')) {
       resetCurrentArtifactId();
       setVisible(true);
-      if (artifacts?.[artifact.id] == null) {
-        setArtifacts(visibleArtifacts);
+
+      // Ensure the artifact is in the artifacts state
+      const currentArtifacts = artifacts || {};
+      const currentVisibleArtifacts = visibleArtifacts || {};
+
+      // If the artifact isn't in the main artifacts state, add it
+      if (currentArtifacts[artifact.id] == null) {
+        const updatedArtifacts = {
+          ...currentArtifacts,
+          ...currentVisibleArtifacts,
+          [artifact.id]: artifact,
+        };
+        setArtifacts(updatedArtifacts);
       }
+
       setTimeout(() => {
         setCurrentArtifactId(artifact.id);
       }, 15);
@@ -85,9 +103,21 @@ const ArtifactButton = ({ artifact }: { artifact: Artifact | null }) => {
         // Authenticated user with interactive mode - full functionality
         resetCurrentArtifactId();
         setVisible(true);
-        if (artifacts?.[artifact.id] == null) {
-          setArtifacts(visibleArtifacts);
+
+        // Ensure the artifact is in the artifacts state
+        const currentArtifacts = artifacts || {};
+        const currentVisibleArtifacts = visibleArtifacts || {};
+
+        // If the artifact isn't in the main artifacts state, add it
+        if (currentArtifacts[artifact.id] == null) {
+          const updatedArtifacts = {
+            ...currentArtifacts,
+            ...currentVisibleArtifacts,
+            [artifact.id]: artifact,
+          };
+          setArtifacts(updatedArtifacts);
         }
+
         setTimeout(() => {
           setCurrentArtifactId(artifact.id);
         }, 15);

@@ -1,7 +1,7 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetSharedMessages } from 'librechat-data-provider/react-query';
-import { useLocalize, useDocumentTitle } from '~/hooks';
+import { useLocalize, useDocumentTitle, useAuthContext } from '~/hooks';
 import { useGetStartupConfig } from '~/data-provider';
 import { ShareContext } from '~/Providers';
 import MessagesView from './MessagesView';
@@ -20,7 +20,62 @@ function ShareView() {
   const localize = useLocalize();
   const { data: config } = useGetStartupConfig();
   const { shareId } = useParams<{ shareId: string }>();
-  const { data, isLoading } = useGetSharedMessages(shareId ?? '');
+  const { isAuthenticated } = useAuthContext();
+
+  // State to track if we need to refetch shared messages after login
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+
+  // Fetch shared messages with proper dependency on authentication state
+  const { data, isLoading, refetch } = useGetSharedMessages(shareId ?? '', {
+    enabled: !!shareId,
+    // Refetch when authentication state changes
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  // Effect to refetch shared messages when user logs in
+  useEffect(() => {
+    if (isAuthenticated && data && !(data as any)?.authContext?.isAuthenticated) {
+      // User just logged in, refetch to get updated authentication context
+      refetch();
+      // Dispatch event to notify components of authentication change
+      const event = new CustomEvent('artifact-auth-changed');
+      window.dispatchEvent(event);
+    }
+  }, [isAuthenticated, data, refetch]);
+
+  // Effect to handle URL return parameter after login
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnParam = urlParams.get('return');
+
+    if (returnParam && isAuthenticated) {
+      // User returned from login, refetch shared messages
+      refetch();
+      // Clean up URL without causing a page reload
+      const cleanUrl =
+        window.location.pathname +
+        (window.location.search ? window.location.search.replace(/[?&]return=[^&]*/, '') : '');
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, [isAuthenticated, refetch]);
+
+  // Effect to periodically check authentication state in shared conversations
+  useEffect(() => {
+    if (shareId) {
+      // Set up an interval to check if authentication state has changed
+      const interval = setInterval(() => {
+        if (isAuthenticated && data && !(data as any)?.authContext?.isAuthenticated) {
+          // Authentication state is out of sync, refetch
+          refetch();
+        }
+      }, 2000); // Check every 2 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [shareId, isAuthenticated, data, refetch]);
+
   const dataTree = data && buildTree({ messages: data.messages as TMessage[] });
   const messagesTree = dataTree?.length === 0 ? null : (dataTree ?? null);
 
@@ -66,14 +121,24 @@ function ShareView() {
     );
   }
 
+  // Determine authentication context - prioritize actual auth state over API response
+  const authContext = {
+    isAuthenticated: isAuthenticated || ((data as any)?.authContext?.isAuthenticated ?? false),
+    artifactMode: isAuthenticated
+      ? 'interactive'
+      : ((data as any)?.authContext?.artifactMode ?? 'static'),
+    canInteractWithArtifacts:
+      isAuthenticated || ((data as any)?.authContext?.canInteractWithArtifacts ?? false),
+  };
+
   return (
     <ShareContext.Provider
       value={{
         isSharedConvo: true,
-        isAuthenticated: (data as any)?.authContext?.isAuthenticated ?? false,
-        artifactMode: (data as any)?.authContext?.artifactMode ?? 'static',
+        isAuthenticated: authContext.isAuthenticated,
+        artifactMode: authContext.artifactMode,
         canViewArtifacts: true, // Always allow viewing artifacts in shared conversations
-        canInteractWithArtifacts: (data as any)?.authContext?.canInteractWithArtifacts ?? false,
+        canInteractWithArtifacts: authContext.canInteractWithArtifacts,
         artifactConfig: config?.artifactConfig,
         sharedArtifacts: null, // Will be populated by artifacts if present
       }}

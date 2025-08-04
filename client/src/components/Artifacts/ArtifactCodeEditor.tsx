@@ -81,10 +81,6 @@ const CodeEditor = ({
         updated: currentCode,
       });
     }
-
-    return () => {
-      debouncedMutation.cancel();
-    };
   }, [
     fileKey,
     artifact.index,

@@ -7,7 +7,7 @@ import type { SandpackPreviewRef, CodeEditorRef } from '@codesandbox/sandpack-re
 import useArtifacts from '~/hooks/Artifacts/useArtifacts';
 import DownloadArtifact from './DownloadArtifact';
 import StaticArtifactPreview from './StaticArtifactPreview';
-import { useEditorContext, useShareContext } from '~/Providers';
+import { useEditorContext, useShareContext, useArtifactPermissions } from '~/Providers';
 import ArtifactTabs from './ArtifactTabs';
 import { CopyCodeButton } from './Code';
 import { useLocalize } from '~/hooks';
@@ -17,11 +17,13 @@ export default function Artifacts() {
   const localize = useLocalize();
   const location = useLocation();
   const { isMutating } = useEditorContext();
-  const { isSharedConvo, artifactMode, canInteractWithArtifacts } = useShareContext();
+  const { isSharedConvo } = useShareContext();
+  const { canInteractWithArtifacts, artifactMode } = useArtifactPermissions();
   const editorRef = useRef<CodeEditorRef>();
   const previewRef = useRef<SandpackPreviewRef>();
   const [isVisible, setIsVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [wasReadOnly, setWasReadOnly] = useState(false);
   const setArtifactsVisible = useSetRecoilState(store.artifactsVisibility);
 
   useEffect(() => {
@@ -47,6 +49,35 @@ export default function Artifacts() {
   // For shared conversations: show static preview if not authenticated or can't interact
   // For authenticated users: show interactive view if they can interact, otherwise static preview
   const isSharedReadOnly = isSharedConvo && !canInteractWithArtifacts;
+
+  // Track if we were previously in read-only mode to detect authentication changes
+  useEffect(() => {
+    if (isSharedConvo && wasReadOnly && !isSharedReadOnly) {
+      // User just authenticated in a shared conversation, trigger a refresh
+      setIsVisible(false);
+      setTimeout(() => {
+        setIsVisible(true);
+        // Force a re-render by updating the component key
+        const event = new CustomEvent('artifact-auth-changed');
+        window.dispatchEvent(event);
+      }, 100);
+    }
+    setWasReadOnly(isSharedReadOnly);
+  }, [isSharedReadOnly, wasReadOnly, isSharedConvo]);
+
+  // Listen for authentication change events
+  useEffect(() => {
+    const handleAuthChange = () => {
+      if (isSharedConvo && !isSharedReadOnly) {
+        // Force re-render when authentication changes in shared conversations
+        setIsVisible(false);
+        setTimeout(() => setIsVisible(true), 50);
+      }
+    };
+
+    window.addEventListener('artifact-auth-changed', handleAuthChange);
+    return () => window.removeEventListener('artifact-auth-changed', handleAuthChange);
+  }, [isSharedConvo, isSharedReadOnly]);
 
   const handleRefresh = () => {
     // Don't allow refresh in read-only mode

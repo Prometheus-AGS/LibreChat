@@ -13,9 +13,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Default values
-DEFAULT_EMAIL="admin@prometheusags.ai"
-DEFAULT_NAME="Admin User"
-DEFAULT_USERNAME="admin"
+DEFAULT_EMAIL="tjames@prometheusags.ai"
+DEFAULT_NAME="Travis James"
+DEFAULT_USERNAME="travis"
 
 # Function to print colored output
 print_info() {

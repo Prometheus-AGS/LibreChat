@@ -14,6 +14,7 @@ export default function useArtifacts() {
   const resetArtifacts = useResetRecoilState(store.artifactsState);
   const resetCurrentArtifactId = useResetRecoilState(store.currentArtifactId);
   const [currentArtifactId, setCurrentArtifactId] = useRecoilState(store.currentArtifactId);
+  
 
   const orderedArtifactIds = useMemo(() => {
     return Object.keys(artifacts ?? {}).sort(

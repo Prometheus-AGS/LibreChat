@@ -618,6 +618,7 @@ export type TStartupConfig = {
     }
   >;
   mcpPlaceholder?: string;
+  artifactConfig?: TArtifactConfig;
 };
 
 export enum OCRStrategy {
@@ -805,6 +806,8 @@ export const artifactSchema = z
       maxFileSize: 1048576,
     },
   });
+
+export type TArtifactConfig = z.infer<typeof artifactSchema>;
 
 export const configSchema = z.object({
   version: z.string(),

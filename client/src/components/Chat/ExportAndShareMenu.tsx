@@ -18,6 +18,7 @@ export default function ExportAndShareMenu({
   const [showExports, setShowExports] = useState(false);
   const [isPopoverActive, setIsPopoverActive] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  console.log('ExportAndShareMenu rendered');
 
   const menuId = useId();
   const shareButtonRef = useRef<HTMLButtonElement>(null);

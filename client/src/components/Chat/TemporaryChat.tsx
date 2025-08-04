@@ -12,6 +12,7 @@ export function TemporaryChat() {
   const localize = useLocalize();
   const [isTemporary, setIsTemporary] = useRecoilState(store.isTemporary);
   const { conversation, isSubmitting } = useChatContext();
+  console.log('TemporaryChat rendered');
 
   const temporaryBadge = {
     id: 'temporary',

@@ -1,12 +1,13 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
 import throttle from 'lodash/throttle';
 import { visit } from 'unist-util-visit';
-import { useSetRecoilState } from 'recoil';
+import { useSetRecoilState, useRecoilCallback } from 'recoil';
 import { useLocation } from 'react-router-dom';
 import type { Pluggable } from 'unified';
 import type { Artifact } from '~/common';
 import { useMessageContext, useArtifactContext } from '~/Providers';
 import { artifactsState } from '~/store/artifacts';
+import store from '~/store';
 import { logger, extractContent } from '~/utils';
 import ArtifactButton from './ArtifactButton';
 
@@ -52,6 +53,7 @@ export function Artifact({
   const artifactIndex = useRef(getNextIndex(false)).current;
 
   const setArtifacts = useSetRecoilState(artifactsState);
+  const setArtifactsVisible = useSetRecoilState(store.artifactsVisibility);
   const [artifact, setArtifact] = useState<Artifact | null>(null);
 
   const throttledUpdateRef = useRef(
@@ -88,22 +90,33 @@ export function Artifact({
         lastUpdateTime: now,
       };
 
-      if (!location.pathname.includes('/c/')) {
+      if (!location.pathname.includes('/c/') && !location.pathname.includes('/share/')) {
         return setArtifact(currentArtifact);
       }
 
       setArtifacts((prevArtifacts) => {
+        const isNewArtifact = prevArtifacts?.[artifactKey] == null;
+        
         if (
-          prevArtifacts?.[artifactKey] != null &&
+          !isNewArtifact &&
           prevArtifacts[artifactKey]?.content === content
         ) {
           return prevArtifacts;
         }
 
-        return {
+        const updatedArtifacts = {
           ...prevArtifacts,
           [artifactKey]: currentArtifact,
         };
+
+        // Automatically show artifacts when a new one is added
+        if (isNewArtifact) {
+          setTimeout(() => {
+            setArtifactsVisible(true);
+          }, 100);
+        }
+
+        return updatedArtifacts;
       });
 
       setArtifact(currentArtifact);

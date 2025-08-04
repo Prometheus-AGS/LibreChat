@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { Artifact } from '~/common';
 import { useGetStartupConfig } from '~/data-provider';
+import { useAuthContext } from '~/hooks';
 
 export type ArtifactMode = 'interactive' | 'static' | 'disabled';
 
@@ -38,17 +39,24 @@ export const useShareContext = () => useContext(ShareContext);
 export const useArtifactPermissions = () => {
   const shareContext = useShareContext();
   const { data: startupConfig } = useGetStartupConfig();
+  const { isAuthenticated: globalAuthState } = useAuthContext();
 
   // For shared conversations, use the context values directly from ShareView
-  // which already has the authentication context from the API
+  // but prioritize global authentication state for interactive access
   if (shareContext.isSharedConvo) {
     const config = shareContext.artifactConfig || startupConfig?.artifactConfig || {};
     const sharedConfig = config.sharedConversations || {};
 
+    // For shared conversations, use global auth state to determine interactive access
+    const isAuthenticated = globalAuthState || shareContext.isAuthenticated || false;
+    const canInteractWithArtifacts =
+      isAuthenticated && sharedConfig.requireAuthentication !== false;
+    const artifactMode: ArtifactMode = canInteractWithArtifacts ? 'interactive' : 'static';
+
     return {
       canViewArtifacts: shareContext.canViewArtifacts ?? true,
-      canInteractWithArtifacts: shareContext.canInteractWithArtifacts ?? false,
-      artifactMode: shareContext.artifactMode ?? 'static',
+      canInteractWithArtifacts,
+      artifactMode,
       config: {
         ...config,
         sharedConversations: {
