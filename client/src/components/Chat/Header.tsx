@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
+import { useMediaQuery } from '@librechat/client';
 import { useOutletContext } from 'react-router-dom';
-import {
-  getConfigDefaults,
-  PermissionTypes,
-  Permissions,
-  SystemRoles,
-} from 'librechat-data-provider';
+import { getConfigDefaults, PermissionTypes, Permissions } from 'librechat-data-provider';
 import type { ContextType } from '~/common';
 import ModelSelector from './Menus/Endpoints/ModelSelector';
 import { PresetsMenu, HeaderNewChat, OpenSidebar } from './Menus';
@@ -14,15 +10,13 @@ import ExportAndShareMenu from './ExportAndShareMenu';
 import BookmarkMenu from './Menus/BookmarkMenu';
 import { TemporaryChat } from './TemporaryChat';
 import AddMultiConvo from './AddMultiConvo';
-import ArtifactAdminSettings from '../Artifacts/AdminSettings';
-import { useHasAccess, useAuthContext, useMediaQuery } from '~/hooks';
+import { useHasAccess } from '~/hooks';
 
 const defaultInterface = getConfigDefaults().interface;
 
 export default function Header() {
   const { data: startupConfig } = useGetStartupConfig();
   const { navVisible, setNavVisible } = useOutletContext<ContextType>();
-  const { user } = useAuthContext();
   const interfaceConfig = useMemo(
     () => startupConfig?.interface ?? defaultInterface,
     [startupConfig],
@@ -81,7 +75,6 @@ export default function Header() {
               isSharedButtonEnabled={startupConfig?.sharedLinksEnabled ?? false}
             />
             <TemporaryChat />
-            {user?.role === SystemRoles.ADMIN && <ArtifactAdminSettings />}
           </div>
         )}
       </div>

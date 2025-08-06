@@ -315,33 +315,6 @@ endpoints:
 # # See the Custom Configuration Guide for more information on Assistants Config:
 # # https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/assistants_endpoint
 
-# Artifact configuration for shared conversations
-# artifacts:
-#   # Enable/disable artifacts functionality globally (default: true)
-#   enabled: true
-#   # Shared conversation artifact access configuration
-#   sharedConversations:
-#     # Allow anonymous users to view static artifact previews (default: true)
-#     allowAnonymousPreview: true
-#     # Require authentication for any artifact access - overrides allowAnonymousPreview (default: false)
-#     requireAuthentication: false
-#     # Maximum content length for static previews in characters (default: 5000, min: 100, max: 50000)
-#     previewMaxLength: 5000
-#     # Show login prompt for anonymous users (default: true)
-#     showLoginPrompt: true
-#     # Custom message for anonymous users (optional)
-#     anonymousMessage: "Please log in to interact with artifacts"
-#   # Content processing configuration
-#   processing:
-#     # Enable syntax highlighting for code artifacts (default: true)
-#     enableSyntaxHighlighting: true
-#     # Enable HTML iframe previews for HTML artifacts (default: true)
-#     enableHtmlPreviews: true
-#     # Sanitize HTML content for security (default: true)
-#     sanitizeHtml: true
-#     # Maximum file size for artifact processing in bytes (default: 1048576 = 1MB, min: 1024, max: 10485760)
-#     maxFileSize: 1048576
-
 # Memory configuration for user memories
 # memory:
 #   # (optional) Disable memory functionality

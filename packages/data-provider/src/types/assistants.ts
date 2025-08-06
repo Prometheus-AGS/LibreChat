@@ -1,9 +1,9 @@
 import type { OpenAPIV3 } from 'openapi-types';
-import type { AssistantsEndpoint, AgentProvider } from '../schemas';
+import type { AssistantsEndpoint, AgentProvider } from 'src/schemas';
 import type { ContentTypes } from './runs';
 import type { Agents } from './agents';
 import type { TFile } from './files';
-import { ArtifactModes } from '../artifacts';
+import { ArtifactModes } from 'src/artifacts';
 
 export type Schema = OpenAPIV3.SchemaObject & { description?: string };
 export type Reference = OpenAPIV3.ReferenceObject & { description?: string };

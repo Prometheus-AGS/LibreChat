@@ -746,66 +746,6 @@ export const memorySchema = z.object({
 
 export type TMemoryConfig = z.infer<typeof memorySchema>;
 
-// Artifact configuration schema
-export const artifactSchema = z
-  .object({
-    // Enable/disable artifacts functionality globally
-    enabled: z.boolean().default(true),
-    // Shared conversation artifact access configuration
-    sharedConversations: z
-      .object({
-        // Allow anonymous users to view static artifact previews
-        allowAnonymousPreview: z.boolean().default(true),
-        // Require authentication for any artifact access (overrides allowAnonymousPreview)
-        requireAuthentication: z.boolean().default(false),
-        // Maximum content length for static previews (in characters)
-        previewMaxLength: z.number().min(100).max(50000).default(5000),
-        // Show login prompt for anonymous users
-        showLoginPrompt: z.boolean().default(true),
-        // Custom message for anonymous users
-        anonymousMessage: z.string().optional(),
-      })
-      .default({
-        allowAnonymousPreview: true,
-        requireAuthentication: false,
-        previewMaxLength: 5000,
-        showLoginPrompt: true,
-      }),
-    // Content processing configuration
-    processing: z
-      .object({
-        // Enable syntax highlighting for code artifacts
-        enableSyntaxHighlighting: z.boolean().default(true),
-        // Enable HTML iframe previews for HTML artifacts
-        enableHtmlPreviews: z.boolean().default(true),
-        // Sanitize HTML content for security
-        sanitizeHtml: z.boolean().default(true),
-        // Maximum file size for artifact processing (in bytes)
-        maxFileSize: z.number().min(1024).max(10485760).default(1048576), // 1MB default
-      })
-      .default({
-        enableSyntaxHighlighting: true,
-        enableHtmlPreviews: true,
-        sanitizeHtml: true,
-        maxFileSize: 1048576,
-      }),
-  })
-  .default({
-    enabled: true,
-    sharedConversations: {
-      allowAnonymousPreview: true,
-      requireAuthentication: false,
-      previewMaxLength: 5000,
-      showLoginPrompt: true,
-    },
-    processing: {
-      enableSyntaxHighlighting: true,
-      enableHtmlPreviews: true,
-      sanitizeHtml: true,
-      maxFileSize: 1048576,
-    },
-  });
-
 export const configSchema = z.object({
   version: z.string(),
   cache: z.boolean().default(true),
@@ -820,7 +760,6 @@ export const configSchema = z.object({
   interface: intefaceSchema,
   turnstile: turnstileSchema.optional(),
   fileStrategy: fileSourceSchema.default(FileSources.local),
-  artifacts: artifactSchema.optional(),
   actions: z
     .object({
       allowedDomains: z.array(z.string()).optional(),

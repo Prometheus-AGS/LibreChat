@@ -239,33 +239,6 @@ LibreChat is a full-stack JavaScript/TypeScript application with a monorepo stru
   /data-schemas   - Database schemas
 ```
 
-## Enhanced Development Rules
-
-### Rule 1: Post-Bug Resolution Memory Creation
-**WHEN**: Immediately after successfully fixing any bug that resulted in zero errors/warnings
-**ACTION**: Use the memory MCP server to create a detailed memory entry containing:
-- Specific error symptoms encountered
-- Root cause identified
-- Exact solution implemented
-- Files modified and key changes made
-- Testing approach used to verify the fix
-
-**PURPOSE**: Prevent recurring similar issues and accelerate future debugging by building institutional knowledge
-
-**EXAMPLE MEMORY TITLE**: "Fixed [Component] [Error Type]: [Brief Description]"
-
-### Rule 2: Pre-Development Context Research
-**WHEN**: Before implementing any new feature or bug fix
-**ACTION**: Query the memory MCP server to search for:
-- Similar bugs previously encountered and resolved
-- Related features already implemented
-- Architectural patterns used for comparable functionality
-- Known pitfalls or considerations for the specific area of code
-
-**PURPOSE**: Leverage existing knowledge to avoid repeating mistakes, maintain consistency, and accelerate development
-
-**SEARCH STRATEGY**: Use specific keywords related to the component, error type, or feature being developed
-
 ## Documentation Guidelines
 
 - The `docs` subdirectory is where all specs are

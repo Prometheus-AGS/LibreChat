@@ -29,13 +29,6 @@ export interface SharedLinksResult {
   hasNextPage: boolean;
 }
 
-export interface AuthContext {
-  isAuthenticated: boolean;
-  userId: string | null;
-  canInteractWithArtifacts: boolean;
-  artifactMode: 'interactive' | 'static';
-}
-
 export interface SharedMessagesResult {
   conversationId: string;
   messages: Array<IMessage>;
@@ -44,7 +37,6 @@ export interface SharedMessagesResult {
   isPublic: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  authContext?: AuthContext;
 }
 
 export interface CreateShareResult {

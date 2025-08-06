@@ -84,8 +84,8 @@ export async function createRun({
 
   /** Resolves issues with new OpenAI usage field */
   if (
-    customProviders.has(provider) ||
-    (provider === Providers.OPENAI && agent.endpoint !== agent.provider)
+    customProviders.has(agent.provider) ||
+    (agent.provider === Providers.OPENAI && agent.endpoint !== agent.provider)
   ) {
     llmConfig.streamUsage = false;
     llmConfig.usage = true;

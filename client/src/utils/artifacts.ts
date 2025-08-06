@@ -138,30 +138,7 @@ export function getProps(type: string): Partial<SandpackProviderProps> {
 }
 
 export const sharedOptions: SandpackProviderProps['options'] = {
-  externalResources: [
-    'https://unpkg.com/@tailwindcss/ui/dist/tailwind-ui.min.css',
-    'https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js',
-    'https://unpkg.com/lodash@4.17.21/lodash.min.js',
-  ],
-  // Enable network access, local storage, IndexedDB, and web workers
-  // by using a less restrictive bundler configuration
-  bundlerURL: undefined, // Use default bundler which supports these features
-
-  // Enable all advanced features for maximum functionality
-  recompileMode: 'immediate',
-  recompileDelay: 300,
-  autorun: true,
-  autoReload: true,
-};
-
-// Enhanced iframe props for maximum functionality
-export const enhancedIframeProps = {
-  // Allow all permissions for network access, storage, and workers
-  allow:
-    'camera; microphone; geolocation; midi; encrypted-media; fullscreen; payment; picture-in-picture; publickey-credentials-get; screen-wake-lock; web-share; xr-spatial-tracking',
-  // Remove sandbox restrictions to enable network, storage, and workers
-  sandbox:
-    'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-orientation-lock allow-pointer-lock allow-presentation allow-top-navigation allow-top-navigation-by-user-activation',
+  externalResources: ['https://unpkg.com/@tailwindcss/ui/dist/tailwind-ui.min.css'],
 };
 
 export const sharedFiles = {

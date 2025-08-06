@@ -22,51 +22,15 @@ if (allowSharedLinks) {
   const allowSharedLinksPublic =
     process.env.ALLOW_SHARED_LINKS_PUBLIC === undefined ||
     isEnabled(process.env.ALLOW_SHARED_LINKS_PUBLIC);
-  // Optional JWT authentication middleware - checks for auth but doesn't require it
-  const optionalJwtAuth = async (req, res, next) => {
-    try {
-      // Try to authenticate if JWT token is present, but don't fail if missing
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        // If there's a token, try to authenticate using the same logic as requireJwtAuth
-        const jwt = require('jsonwebtoken');
-        const { getUserById } = require('~/models/User');
-
-        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await getUserById(decoded.id);
-
-        if (user) {
-          req.user = user;
-        }
-      }
-      // Continue regardless of auth success/failure
-      next();
-    } catch (error) {
-      // If authentication fails, continue without user (don't throw error)
-      next();
-    }
-  };
-
   router.get(
     '/:shareId',
-    allowSharedLinksPublic ? optionalJwtAuth : requireJwtAuth,
+    allowSharedLinksPublic ? (req, res, next) => next() : requireJwtAuth,
     async (req, res) => {
       try {
         const share = await getSharedMessages(req.params.shareId);
 
         if (share) {
-          // Add authentication context to the response
-          const responseData = {
-            ...share,
-            authContext: {
-              isAuthenticated: !!req.user,
-              userId: req.user?.id || null,
-              canInteractWithArtifacts: !!req.user, // Authenticated users can interact with artifacts
-              artifactMode: req.user ? 'interactive' : 'static', // Interactive for auth users, static for anonymous
-            },
-          };
-          res.status(200).json(responseData);
+          res.status(200).json(share);
         } else {
           res.status(404).end();
         }

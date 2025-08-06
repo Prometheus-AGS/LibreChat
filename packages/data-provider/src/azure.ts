@@ -5,10 +5,10 @@ import type {
   TAzureModelGroupMap,
   TValidatedAzureConfig,
   TAzureConfigValidationResult,
-} from './config';
-import { extractEnvVariable, envVarRegex } from './utils';
-import { azureGroupConfigsSchema } from './config';
-import { errorsToString } from './parsers';
+} from '../src/config';
+import { extractEnvVariable, envVarRegex } from '../src/utils';
+import { azureGroupConfigsSchema } from '../src/config';
+import { errorsToString } from '../src/parsers';
 
 export const deprecatedAzureVariables = [
   /* "related to" precedes description text */
@@ -239,13 +239,13 @@ export function mapModelToAzureConfig({
   const { deploymentName = '', version = '' } =
     typeof modelDetails === 'object'
       ? {
-          deploymentName: modelDetails.deploymentName ?? groupConfig.deploymentName,
-          version: modelDetails.version ?? groupConfig.version,
-        }
+        deploymentName: modelDetails.deploymentName ?? groupConfig.deploymentName,
+        version: modelDetails.version ?? groupConfig.version,
+      }
       : {
-          deploymentName: groupConfig.deploymentName,
-          version: groupConfig.version,
-        };
+        deploymentName: groupConfig.deploymentName,
+        version: groupConfig.version,
+      };
 
   if (!deploymentName || !version) {
     throw new Error(
@@ -335,13 +335,13 @@ export function mapGroupToAzureConfig({
   const { deploymentName = '', version = '' } =
     typeof modelDetails === 'object'
       ? {
-          deploymentName: modelDetails.deploymentName ?? groupConfig.deploymentName,
-          version: modelDetails.version ?? groupConfig.version,
-        }
+        deploymentName: modelDetails.deploymentName ?? groupConfig.deploymentName,
+        version: modelDetails.version ?? groupConfig.version,
+      }
       : {
-          deploymentName: groupConfig.deploymentName,
-          version: groupConfig.version,
-        };
+        deploymentName: groupConfig.deploymentName,
+        version: groupConfig.version,
+      };
 
   if (!deploymentName || !version) {
     throw new Error(
