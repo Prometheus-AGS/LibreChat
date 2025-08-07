@@ -1,3 +1,4 @@
+const path = require('path');
 const axios = require('axios');
 const { Providers } = require('@librechat/agents');
 const { logAxiosError } = require('@librechat/api');
@@ -88,7 +89,14 @@ const fetchModels = async ({
       options.headers['OpenAI-Organization'] = process.env.OPENAI_ORGANIZATION;
     }
 
-    const url = new URL(`${baseURL}${azure ? '' : '/models'}`);
+    console.log(
+      `[ModelService] Fetching models for "${name}". baseURL: "${baseURL}", azure: ${!!azure}`,
+    );
+
+    const url = new URL(baseURL);
+    if (!azure) {
+      url.pathname = path.join(url.pathname, '/models');
+    }
     if (user && userIdQuery) {
       url.searchParams.append('user', user);
     }

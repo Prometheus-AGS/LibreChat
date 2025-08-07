@@ -220,6 +220,10 @@ class RequestExecutor {
       client_url,
       scope,
       token_exchange_method,
+      /* Django Token */
+      django_username,
+      django_password,
+      django_base_url,
     } = metadata.auth;
 
     const {
@@ -246,6 +250,15 @@ class RequestExecutor {
       scope != null &&
       scope &&
       token_exchange_method
+    );
+    const isDjangoToken = !!(
+      django_username != null &&
+      django_username &&
+      django_password != null &&
+      django_password &&
+      django_base_url != null &&
+      django_base_url &&
+      type === AuthTypeEnum.DjangoToken
     );
 
     if (isApiKey && authorization_type === AuthorizationTypeEnum.Basic) {
@@ -279,6 +292,23 @@ class RequestExecutor {
       // If valid, use it
       this.authToken = oauth_access_token;
       this.authHeaders['Authorization'] = `Bearer ${this.authToken}`;
+    } else if (isDjangoToken) {
+      // Django token authentication - get token from Django auth service
+      try {
+        const { getDjangoToken } = await import(
+          '../../../api/app/clients/tools/util/handleTools.js'
+        );
+        const token = await getDjangoToken({
+          username: django_username,
+          password: django_password,
+          baseUrl: django_base_url,
+        });
+        this.authToken = token;
+        this.authHeaders['Authorization'] = `Token ${this.authToken}`;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(`Django authentication failed: ${errorMessage}`);
+      }
     }
     return this;
   }

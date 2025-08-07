@@ -192,5 +192,23 @@
         "description": "Provide your Flux API key from your user profile."
       }
     ]
+  },
+  {
+    "name": "BRIUS",
+    "pluginKey": "brius",
+    "description": "BRIUS Planner Application API - A comprehensive dental practice management and orthodontic treatment planning system.",
+    "icon": "https://test.brius.com/favicon.ico",
+    "authConfig": [
+      {
+        "authField": "BRIUS_EMAIL",
+        "label": "BRIUS Email",
+        "description": "Your BRIUS account email address"
+      },
+      {
+        "authField": "BRIUS_PASSWORD",
+        "label": "BRIUS Password",
+        "description": "Your BRIUS account password"
+      }
+    ]
   }
 ]

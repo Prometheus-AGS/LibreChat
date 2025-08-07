@@ -36,6 +36,33 @@ async function getBalanceConfig() {
 }
 
 /**
+ * Retrieves the artifact validation configuration
+ * @function getArtifactValidationConfig
+ * @returns {Promise<Object>}
+ * */
+async function getArtifactValidationConfig() {
+  /** @type {Object} */
+  const config = {
+    enabled: isEnabled(process.env.ARTIFACT_VALIDATION_ENABLED),
+    maxRetries: parseInt(process.env.ARTIFACT_VALIDATION_MAX_RETRIES, 10) || 3,
+    timeout: parseInt(process.env.ARTIFACT_VALIDATION_TIMEOUT, 10) || 15000,
+    memoryLimit: parseInt(process.env.ARTIFACT_VALIDATION_MEMORY_LIMIT, 10) || 512,
+    streaming: {
+      enabled: isEnabled(process.env.ARTIFACT_VALIDATION_STREAMING_ENABLED),
+      detailed: isEnabled(process.env.ARTIFACT_VALIDATION_STREAMING_DETAILED),
+      delay: parseInt(process.env.ARTIFACT_VALIDATION_STREAMING_DELAY, 10) || 100,
+    },
+  };
+
+  const customConfig = await getCustomConfig();
+  if (!customConfig) {
+    return config;
+  }
+
+  return { ...config, ...(customConfig?.['artifactValidation'] ?? {}) };
+}
+
+/**
  *
  * @param {string | EModelEndpoint} endpoint
  * @returns {Promise<TEndpoint | undefined>}
@@ -91,6 +118,7 @@ module.exports = {
   getMCPAuthMap,
   getCustomConfig,
   getBalanceConfig,
+  getArtifactValidationConfig,
   hasCustomUserVars,
   getCustomEndpointConfig,
 };

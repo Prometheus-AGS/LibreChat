@@ -8,6 +8,8 @@ const {
 } = require('~/server/middleware');
 const { disposeClient, clientRegistry, requestDataMap } = require('~/server/cleanup');
 const { saveMessage } = require('~/models');
+const ArtifactValidationMiddleware = require('~/server/services/ArtifactValidation/middleware');
+const artifactValidationConfig = require('~/server/services/ArtifactValidation/config');
 
 const AgentController = async (req, res, next, initializeClient, addTitle) => {
   let {
@@ -182,6 +184,85 @@ const AgentController = async (req, res, next, initializeClient, addTitle) => {
     };
 
     let response = await client.sendMessage(text, messageOptions);
+
+    // Validate artifacts if enabled
+    if (artifactValidationConfig.isEnabled()) {
+      try {
+        logger.debug('[AgentController] Starting artifact validation', {
+          messageId: response.messageId,
+          hasText: !!response.text,
+        });
+
+        const validationMiddleware = new ArtifactValidationMiddleware();
+
+        // Create AI client function for retry attempts
+        const aiClientFunction = async (retryText, retryOptions = {}) => {
+          logger.debug('[AgentController] Executing AI retry for artifact validation', {
+            originalMessageId: response.messageId,
+            retryAttempt: retryOptions.attempt || 1,
+          });
+
+          // Use the same client and options for retry
+          const retryResponse = await client.sendMessage(retryText, {
+            ...messageOptions,
+            isRetry: true,
+            originalMessageId: response.messageId,
+            retryAttempt: retryOptions.attempt || 1,
+          });
+
+          return retryResponse;
+        };
+
+        // Validate the response message with streaming feedback
+        const validationResult = await validationMiddleware.validateMessage(
+          response,
+          aiClientFunction,
+          {
+            userId,
+            conversationId,
+            endpoint: endpointOption.endpoint,
+            messageId: response.messageId,
+          },
+          res, // Pass response stream for streaming feedback
+        );
+
+        // Update response with validated message
+        if (validationResult.message) {
+          response = { ...response, ...validationResult.message };
+        }
+
+        // Log validation results
+        if (validationResult.validationResults?.length > 0) {
+          const successCount = validationResult.validationResults.filter((r) => r.success).length;
+          const failureCount = validationResult.validationResults.filter((r) => !r.success).length;
+
+          logger.info('[AgentController] Artifact validation completed', {
+            messageId: response.messageId,
+            totalArtifacts: validationResult.validationResults.length,
+            successful: successCount,
+            failed: failureCount,
+            hasValidationErrors: validationResult.hasValidationErrors,
+          });
+
+          // Add validation metadata to response for debugging
+          if (artifactValidationConfig.get('detailedLogging')) {
+            response.artifactValidation = {
+              results: validationResult.validationResults,
+              hasErrors: validationResult.hasValidationErrors,
+            };
+          }
+        }
+      } catch (validationError) {
+        logger.error('[AgentController] Error during artifact validation', {
+          messageId: response.messageId,
+          error: validationError.message,
+          stack: validationError.stack,
+        });
+
+        // Don't fail the entire request if validation fails
+        // Just log the error and continue with the original response
+      }
+    }
 
     // Extract what we need and immediately break reference
     const messageId = response.messageId;

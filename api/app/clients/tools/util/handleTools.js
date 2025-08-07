@@ -20,6 +20,7 @@ const {
   createYouTubeTools,
   TavilySearchResults,
   createOpenAIImageTools,
+  Brius,
 } = require('../');
 const { primeFiles: primeCodeFiles } = require('~/server/services/Files/Code/process');
 const { createFileSearchTool, primeFiles: primeSearchFiles } = require('./fileSearch');
@@ -27,6 +28,7 @@ const { getUserPluginAuthValue } = require('~/server/services/PluginService');
 const { loadAuthValues } = require('~/server/services/Tools/credentials');
 const { getCachedTools } = require('~/server/services/Config');
 const { createMCPTool } = require('~/server/services/MCP');
+const { getDjangoAuthToken } = require('~/server/services/Tools/djangoAuth');
 
 /**
  * Validates the availability and authentication of tools for a user based on environment variables or user-specific plugin authentication values.
@@ -153,6 +155,7 @@ const loadTools = async ({
     'azure-ai-search': StructuredACS,
     traversaal_search: TraversaalSearch,
     tavily_search_results_json: TavilySearchResults,
+    brius: Brius,
   };
 
   const customConstructors = {
@@ -202,6 +205,13 @@ const loadTools = async ({
         req: options.req,
         imageFiles,
       });
+    },
+    brius: async () => {
+      const token = await getDjangoAuthToken({
+        userId: user,
+        loginUrl: 'https://test.brius.com/rest-auth/login/',
+      });
+      return new Brius({ token });
     },
   };
 
@@ -349,8 +359,26 @@ Current Date & Time: ${replaceSpecialVars({ text: '{{iso_datetime}}' })}
   return { loadedTools, toolContextMap };
 };
 
+/**
+ * Gets a Django authentication token using username and password
+ * @param {Object} credentials - The Django credentials
+ * @param {string} credentials.username - Django username
+ * @param {string} credentials.password - Django password
+ * @param {string} credentials.baseUrl - Django base URL
+ * @returns {Promise<string>} The authentication token
+ */
+const getDjangoToken = async ({ username, password, baseUrl }) => {
+  try {
+    return await getDjangoAuthToken(username, password, baseUrl);
+  } catch (error) {
+    logger.error('Failed to get Django token:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   loadToolWithAuth,
   validateTools,
   loadTools,
+  getDjangoToken,
 };

@@ -58,6 +58,11 @@ export default [
         ...Object.keys(pkg.peerDependencies || {}),
         'react',
         'react-dom',
+        // Exclude API files to prevent circular dependencies
+        /^\.\.\/\.\.\/api\//,
+        /^@librechat\/api/,
+        // Exclude all files outside the packages directory
+        /^\.\.\/\.\.\//,
       ],
       preserveSymlinks: true,
       plugins,

@@ -16,7 +16,7 @@ export const accordian = `import * as React from "react"
 import * as AccordionPrimitive from "@radix-ui/react-accordion"
 import { ChevronDown } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Accordion = AccordionPrimitive.Root
 
@@ -72,7 +72,7 @@ export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
 export const alertDialog = `import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 import { buttonVariants } from "./button"
 
 const AlertDialog = AlertDialogPrimitive.Root
@@ -212,7 +212,7 @@ export {
 export const alert = `import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const alertVariants = cva(
   "relative w-full rounded-lg border border-gray-200 p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-gray-950 dark:border-gray-800 dark:[&>svg]:text-gray-50",
@@ -273,7 +273,7 @@ export { Alert, AlertTitle, AlertDescription }
 export const avatar = `import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -323,7 +323,7 @@ export { Avatar, AvatarImage, AvatarFallback }
 export const badge = `import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const badgeVariants = cva(
   "inline-flex items-center rounded-full border border-gray-200 px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 dark:border-gray-800 dark:focus:ring-gray-300",
@@ -362,7 +362,7 @@ export const breadcrumb = `import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -536,7 +536,7 @@ export const calendar = `import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 import { buttonVariants } from "./button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
@@ -684,7 +684,7 @@ import useEmblaCarousel, {
 } from "embla-carousel-react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 import { Button } from "./button"
 
 type CarouselApi = UseEmblaCarouselType[1]
@@ -944,7 +944,7 @@ export const checkbox = `import * as React from "react"
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
 import { Check } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
@@ -985,7 +985,7 @@ export const dialog = `import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Dialog = DialogPrimitive.Root
 
@@ -1106,7 +1106,7 @@ export {
 export const drawer = `import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Drawer = ({
   shouldScaleBackground = true,
@@ -1225,7 +1225,7 @@ export const dropdownMenu = `import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -1424,7 +1424,7 @@ export {
 export const hoverCard = `import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const HoverCard = HoverCardPrimitive.Root
 
@@ -1451,7 +1451,7 @@ export { HoverCard, HoverCardTrigger, HoverCardContent }
 
 `;
 export const input = `import * as React from "react"
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
@@ -1505,7 +1505,7 @@ import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const MenubarMenu = MenubarPrimitive.Menu
 
@@ -1742,7 +1742,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
@@ -1870,7 +1870,7 @@ export {
 export const pagination = `import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 import { ButtonProps, buttonVariants } from "./button"
 
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
@@ -1989,7 +1989,7 @@ export {
 export const popover = `import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Popover = PopoverPrimitive.Root
 
@@ -2020,7 +2020,7 @@ export { Popover, PopoverTrigger, PopoverContent }
 export const progress = `import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
@@ -2048,7 +2048,7 @@ export const radioGroup = `import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { Circle } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
@@ -2092,7 +2092,7 @@ export const select = `import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Select = SelectPrimitive.Root
 
@@ -2251,7 +2251,7 @@ export {
 export const separator = `import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
@@ -2279,7 +2279,7 @@ Separator.displayName = SeparatorPrimitive.Root.displayName
 export { Separator }
 
 `;
-export const skeleton = `import { cn } from "../../lib/utils"
+export const skeleton = `import { cn } from "/lib/utils"
 
 function Skeleton({
   className,
@@ -2298,7 +2298,7 @@ export { Skeleton }
 export const slider = `import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -2326,7 +2326,7 @@ export { Slider }
 export const switchComponent = `import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
@@ -2354,7 +2354,7 @@ export { Switch }
 `;
 export const table = `import * as React from "react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
@@ -2474,7 +2474,7 @@ export {
 export const tabs = `import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
@@ -2528,7 +2528,7 @@ export { Tabs, TabsList, TabsTrigger, TabsContent }
 `;
 export const textarea = `import * as React from "react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
@@ -2557,7 +2557,7 @@ import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -2720,7 +2720,7 @@ export const toggleGroup = `import * as React from "react"
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group"
 import { type VariantProps } from "class-variance-authority"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 import { toggleVariants } from "./toggle"
 
 const ToggleGroupContext = React.createContext<
@@ -2781,7 +2781,7 @@ export const toggle = `import * as React from "react"
 import * as TogglePrimitive from "@radix-ui/react-toggle"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const toggleVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors hover:bg-gray-100 hover:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-gray-100 data-[state=on]:text-gray-900 dark:ring-offset-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-400 dark:focus-visible:ring-gray-300 dark:data-[state=on]:bg-gray-800 dark:data-[state=on]:text-gray-50",
@@ -2825,7 +2825,7 @@ export { Toggle, toggleVariants }
 export const tooltip = `import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
-import { cn } from "../../lib/utils"
+import { cn } from "/lib/utils"
 
 const TooltipProvider = TooltipPrimitive.Provider
 

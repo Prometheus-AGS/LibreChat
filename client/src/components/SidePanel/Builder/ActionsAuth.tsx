@@ -33,9 +33,7 @@ export default function ActionsAuth({ disableOAuth }: { disableOAuth?: boolean }
             </label>
           </div>
           <div className="border-token-border-medium flex rounded-lg border text-sm hover:cursor-pointer">
-            <div className="h-9 grow px-3 py-2">
-              {localize(getAuthLocalizationKey(type))}
-            </div>
+            <div className="h-9 grow px-3 py-2">{localize(getAuthLocalizationKey(type))}</div>
             <div className="bg-token-border-medium w-px"></div>
             <button type="button" color="neutral" className="flex items-center gap-2 px-3">
               <svg
@@ -112,6 +110,23 @@ export default function ActionsAuth({ disableOAuth }: { disableOAuth?: boolean }
                 </label>
               </div>
               <div className="flex items-center gap-2">
+                <label htmlFor=":rfd:" className="flex cursor-pointer items-center gap-1">
+                  <RadioGroup.Item
+                    type="button"
+                    role="radio"
+                    value={AuthTypeEnum.DjangoToken}
+                    id=":rfd:"
+                    className={cn(
+                      'mr-1 flex h-5 w-5 items-center justify-center rounded-full border',
+                      'border-border-heavy bg-surface-primary',
+                    )}
+                  >
+                    <RadioGroup.Indicator className="h-2 w-2 rounded-full bg-text-primary" />
+                  </RadioGroup.Item>
+                  {localize('com_ui_django_token')}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
                 <label
                   htmlFor=":rfc:"
                   className={cn(
@@ -138,7 +153,13 @@ export default function ActionsAuth({ disableOAuth }: { disableOAuth?: boolean }
               </div>
             </RadioGroup.Root>
           </div>
-          {type === 'none' ? null : type === 'service_http' ? <ApiKey /> : <OAuth />}
+          {type === 'none' ? null : type === 'service_http' ? (
+            <ApiKey />
+          ) : type === 'django_token' ? (
+            <DjangoToken />
+          ) : (
+            <OAuth />
+          )}
           {/* Cancel/Save */}
           <div className="mt-5 flex flex-col gap-3 sm:mt-4 sm:flex-row-reverse">
             <button
@@ -276,6 +297,8 @@ function getAuthLocalizationKey(type: AuthTypeEnum): TranslationKeys {
       return 'com_ui_api_key';
     case AuthTypeEnum.OAuth:
       return 'com_ui_oauth';
+    case AuthTypeEnum.DjangoToken:
+      return 'com_ui_django_token';
     default:
       return 'com_ui_none';
   }
@@ -373,6 +396,44 @@ const OAuth = () => {
           </label>
         </div>
       </RadioGroup.Root>
+    </>
+  );
+};
+
+const DjangoToken = () => {
+  const localize = useLocalize();
+  const { register, watch } = useFormContext();
+  const type = watch('type');
+
+  const inputClasses = cn(
+    'mb-2 h-9 w-full resize-none overflow-y-auto rounded-lg border px-3 py-2 text-sm',
+    'border-border-medium bg-surface-primary outline-none',
+    'focus:ring-2 focus:ring-ring',
+  );
+
+  return (
+    <>
+      <label className="mb-1 block text-sm font-medium">{localize('com_ui_base_url')}</label>
+      <input
+        placeholder="https://api.example.com"
+        className={inputClasses}
+        {...register('django_base_url', { required: type === AuthTypeEnum.DjangoToken })}
+      />
+      <label className="mb-1 block text-sm font-medium">{localize('com_ui_username')}</label>
+      <input
+        placeholder="username"
+        autoComplete="username"
+        className={inputClasses}
+        {...register('django_username', { required: type === AuthTypeEnum.DjangoToken })}
+      />
+      <label className="mb-1 block text-sm font-medium">{localize('com_ui_password')}</label>
+      <input
+        placeholder="<HIDDEN>"
+        type="password"
+        autoComplete="current-password"
+        className={inputClasses}
+        {...register('django_password', { required: type === AuthTypeEnum.DjangoToken })}
+      />
     </>
   );
 };

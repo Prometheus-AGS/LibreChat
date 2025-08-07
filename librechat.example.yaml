@@ -137,6 +137,1557 @@ actions:
     - "librechat.ai"
     - "google.com"
 
+# Example Django Authentication Configuration
+# Configure Django REST Framework token authentication for tools/actions
+django:
+  username: "tjames@prometheusags.ai"
+  password: "Rjtj123!@#"
+
+# BRIUS API Configuration
+# Complete OpenAPI specification for BRIUS Planner Application
+brius:
+  name: "BRIUS Planner API"
+  description: "REST API for the BRIUS Planner application - a comprehensive dental practice management and orthodontic treatment planning system"
+  baseURL: "https://test.brius.com"
+  authentication:
+    type: "django_token"
+    loginEndpoint: "/rest-auth/login/"
+    credentials:
+      email: "tjames@prometheusags.ai"
+      password: "Rjtj123!@#"
+  openapi: |
+    openapi: 3.0.3
+    info:
+      title: BRIUS Planner Application REST API
+      description: |
+        REST API for the BRIUS Planner application - a comprehensive dental practice management 
+        and orthodontic treatment planning system. This API provides access to patient management,
+        treatment plans, manufacturing workflows, and business operations.
+      version: 2.3.0
+      contact:
+        name: BRIUS Support
+        url: https://test.brius.com
+      license:
+        name: Proprietary
+
+    servers:
+      - url: https://test.brius.com
+        description: Production API Server
+
+    security:
+      - sessionAuth: []
+      - tokenAuth: []
+
+    paths:
+      # Authentication Endpoints
+      /rest-auth/login/:
+        post:
+          summary: Login to get authentication token
+          description: |
+            Authenticate with email and password to receive an authentication token.
+            This token should be used in the Authorization header for subsequent API requests.
+          operationId: login
+          tags:
+            - Authentication
+          security: []
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LoginRequest'
+                example:
+                  email: 'tjames@prometheusags.ai'
+                  password: 'Rjtj123!@#'
+          responses:
+            '200':
+              description: Login successful
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/LoginResponse'
+                  example:
+                    key: 'a1b2c3d4e5f6g7h8i9j0'
+                    user:
+                      id: 9663
+                      username: 'tjames'
+                      email: 'tjames@prometheusags.ai'
+                      first_name: 'Travis'
+                      last_name: 'James'
+            '400':
+              description: Invalid credentials
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      non_field_errors:
+                        type: array
+                        items:
+                          type: string
+                  example:
+                    non_field_errors: ['Unable to log in with provided credentials.']
+
+      /rest-auth/logout/:
+        post:
+          summary: Logout and invalidate token
+          description: Logout the current user and invalidate the authentication token
+          operationId: logout
+          tags:
+            - Authentication
+          responses:
+            '200':
+              description: Logout successful
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      detail:
+                        type: string
+                  example:
+                    detail: 'Successfully logged out.'
+            '401':
+              $ref: '#/components/responses/Unauthorized'
+
+      /rest-auth/password/change/:
+        post:
+          summary: Change password
+          description: Change the password for the authenticated user
+          operationId: changePassword
+          tags:
+            - Authentication
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - old_password
+                    - new_password1
+                    - new_password2
+                  properties:
+                    old_password:
+                      type: string
+                      description: Current password
+                    new_password1:
+                      type: string
+                      description: New password
+                    new_password2:
+                      type: string
+                      description: Confirm new password
+          responses:
+            '200':
+              description: Password changed successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      detail:
+                        type: string
+                  example:
+                    detail: 'New password has been saved.'
+
+      /rest-auth/user/:
+        get:
+          summary: Get current user details
+          description: Retrieve details of the currently authenticated user
+          operationId: getCurrentUser
+          tags:
+            - Authentication
+          responses:
+            '200':
+              description: User details
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/CurrentUser'
+
+      # API Discovery
+      /api/v1/:
+        get:
+          summary: Get API root endpoints
+          description: Returns a list of all available API endpoints
+          operationId: getApiRoot
+          tags:
+            - Root
+          responses:
+            '200':
+              description: List of available endpoints
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      type: string
+                      format: uri
+
+      /api/v1/patients/:
+        get:
+          summary: List patients
+          description: Retrieve a list of patients with optional filtering and pagination
+          operationId: listPatients
+          tags:
+            - Patients
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: status
+              in: query
+              schema:
+                type: integer
+                enum: [0, 1, 2, 4, 5, 10, 11, 12]
+              description: Filter by patient status
+            - name: doctor
+              in: query
+              schema:
+                type: integer
+              description: Filter by doctor ID
+            - name: suspended
+              in: query
+              schema:
+                type: boolean
+              description: Filter by suspended status
+            - name: archived
+              in: query
+              schema:
+                type: boolean
+              description: Filter by archived status
+          responses:
+            '200':
+              description: List of patients
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Patient'
+        post:
+          summary: Create a new patient
+          description: Create a new patient record
+          operationId: createPatient
+          tags:
+            - Patients
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/PatientCreate'
+          responses:
+            '201':
+              description: Patient created successfully
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Patient'
+
+      /api/v1/patients/{id}/:
+        get:
+          summary: Get patient details
+          description: Retrieve detailed information about a specific patient
+          operationId: getPatient
+          tags:
+            - Patients
+          parameters:
+            - $ref: '#/components/parameters/IdParam'
+            - $ref: '#/components/parameters/FormatParam'
+          responses:
+            '200':
+              description: Patient details
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Patient'
+            '404':
+              $ref: '#/components/responses/NotFound'
+        put:
+          summary: Update patient
+          description: Update an existing patient record
+          operationId: updatePatient
+          tags:
+            - Patients
+          parameters:
+            - $ref: '#/components/parameters/IdParam'
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/PatientUpdate'
+          responses:
+            '200':
+              description: Patient updated successfully
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Patient'
+            '404':
+              $ref: '#/components/responses/NotFound'
+        delete:
+          summary: Delete patient
+          description: Delete a patient record
+          operationId: deletePatient
+          tags:
+            - Patients
+          parameters:
+            - $ref: '#/components/parameters/IdParam'
+          responses:
+            '204':
+              description: Patient deleted successfully
+            '404':
+              $ref: '#/components/responses/NotFound'
+
+      /api/v1/instructions/:
+        get:
+          summary: List instructions
+          description: Retrieve a list of treatment instructions
+          operationId: listInstructions
+          tags:
+            - Instructions
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: patient
+              in: query
+              schema:
+                type: integer
+              description: Filter by patient ID
+            - name: status
+              in: query
+              schema:
+                type: integer
+                enum: [0, 1, 2, 4, 5, 10, 11, 12]
+              description: Filter by instruction status
+            - name: course
+              in: query
+              schema:
+                type: integer
+              description: Filter by course ID
+          responses:
+            '200':
+              description: List of instructions
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Instruction'
+        post:
+          summary: Create instruction
+          description: Create a new treatment instruction
+          operationId: createInstruction
+          tags:
+            - Instructions
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/InstructionCreate'
+          responses:
+            '201':
+              description: Instruction created successfully
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Instruction'
+
+      /api/v1/instructions/{id}/:
+        get:
+          summary: Get instruction details
+          operationId: getInstruction
+          tags:
+            - Instructions
+          parameters:
+            - $ref: '#/components/parameters/IdParam'
+            - $ref: '#/components/parameters/FormatParam'
+          responses:
+            '200':
+              description: Instruction details
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Instruction'
+            '404':
+              $ref: '#/components/responses/NotFound'
+
+      /api/v1/plans/:
+        get:
+          summary: List treatment plans
+          operationId: listPlans
+          tags:
+            - Treatment Plans
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: instruction
+              in: query
+              schema:
+                type: integer
+              description: Filter by instruction ID
+          responses:
+            '200':
+              description: List of treatment plans
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Plan'
+
+      /api/v1/plans/{id}/:
+        get:
+          summary: Get treatment plan details
+          operationId: getPlan
+          tags:
+            - Treatment Plans
+          parameters:
+            - $ref: '#/components/parameters/IdParam'
+            - $ref: '#/components/parameters/FormatParam'
+          responses:
+            '200':
+              description: Treatment plan details
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Plan'
+
+      /api/v1/offices/:
+        get:
+          summary: List offices
+          operationId: listOffices
+          tags:
+            - Offices
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: doctor
+              in: query
+              schema:
+                type: integer
+              description: Filter by doctor ID
+          responses:
+            '200':
+              description: List of offices
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Office'
+
+      /api/v1/users/:
+        get:
+          summary: List users
+          operationId: listUsers
+          tags:
+            - Users
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: role
+              in: query
+              schema:
+                type: string
+              description: Filter by user role/group
+          responses:
+            '200':
+              description: List of users
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/User'
+
+      /api/v1/courses/:
+        get:
+          summary: List courses
+          operationId: listCourses
+          tags:
+            - Courses
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+          responses:
+            '200':
+              description: List of available courses
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Course'
+
+      /api/v1/products/:
+        get:
+          summary: List products
+          operationId: listProducts
+          tags:
+            - Products
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - name: course
+              in: query
+              schema:
+                type: integer
+              description: Filter by course ID
+          responses:
+            '200':
+              description: List of products
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Product'
+
+      /api/v1/files/:
+        get:
+          summary: List files
+          operationId: listFiles
+          tags:
+            - Files
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: instruction
+              in: query
+              schema:
+                type: integer
+              description: Filter by instruction ID
+            - name: type
+              in: query
+              schema:
+                type: integer
+              description: Filter by file type
+          responses:
+            '200':
+              description: List of files
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/File'
+
+      /api/v1/tasks/:
+        get:
+          summary: List tasks
+          operationId: listTasks
+          tags:
+            - Tasks
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: instruction
+              in: query
+              schema:
+                type: integer
+              description: Filter by instruction ID
+            - name: actor
+              in: query
+              schema:
+                type: integer
+              description: Filter by assigned actor ID
+            - name: template
+              in: query
+              schema:
+                type: integer
+              description: Filter by template ID
+          responses:
+            '200':
+              description: List of tasks
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Task'
+
+      /api/v1/payments/:
+        get:
+          summary: List payments
+          operationId: listPayments
+          tags:
+            - Payments
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: instruction
+              in: query
+              schema:
+                type: integer
+              description: Filter by instruction ID
+            - name: doctor
+              in: query
+              schema:
+                type: integer
+              description: Filter by doctor ID
+          responses:
+            '200':
+              description: List of payments
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Payment'
+
+      /api/v1/records/:
+        get:
+          summary: List records/communications
+          operationId: listRecords
+          tags:
+            - Records
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: type
+              in: query
+              schema:
+                type: integer
+              description: Filter by record type
+          responses:
+            '200':
+              description: List of records
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Record'
+
+      /api/v1/notifications/:
+        get:
+          summary: List notifications
+          operationId: listNotifications
+          tags:
+            - Notifications
+          parameters:
+            - $ref: '#/components/parameters/FormatParam'
+            - $ref: '#/components/parameters/LimitParam'
+            - $ref: '#/components/parameters/OffsetParam'
+            - name: recipient
+              in: query
+              schema:
+                type: integer
+              description: Filter by recipient user ID
+            - name: read
+              in: query
+              schema:
+                type: boolean
+              description: Filter by read status
+          responses:
+            '200':
+              description: List of notifications
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/Notification'
+
+    components:
+      securitySchemes:
+        sessionAuth:
+          type: apiKey
+          in: cookie
+          name: sessionid
+          description: Django session authentication
+        tokenAuth:
+          type: http
+          scheme: bearer
+          description: Token-based authentication
+
+      parameters:
+        IdParam:
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier
+
+        FormatParam:
+          name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, prettyjson, api, admin]
+            default: json
+          description: Response format
+
+        LimitParam:
+          name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+          description: Number of results to return per page
+
+        OffsetParam:
+          name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The initial index from which to return results
+
+      responses:
+        NotFound:
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Not found.
+
+        Unauthorized:
+          description: Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: Authentication credentials were not provided.
+
+      schemas:
+        LoginRequest:
+          type: object
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+              format: email
+              description: User email address
+              example: 'tjames@prometheusags.ai'
+            password:
+              type: string
+              description: User password
+              example: 'Rjtj123!@#'
+
+        LoginResponse:
+          type: object
+          properties:
+            key:
+              type: string
+              description: Authentication token to be used in Authorization header
+              example: 'a1b2c3d4e5f6g7h8i9j0'
+            user:
+              $ref: '#/components/schemas/CurrentUser'
+
+        CurrentUser:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 9663
+            username:
+              type: string
+              example: 'tjames'
+            email:
+              type: string
+              format: email
+              example: 'tjames@prometheusags.ai'
+            first_name:
+              type: string
+              example: 'Travis'
+            last_name:
+              type: string
+              example: 'James'
+            is_active:
+              type: boolean
+              example: true
+            date_joined:
+              type: string
+              format: date-time
+              readOnly: true
+
+        Patient:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            suffix:
+              type: string
+              readOnly: true
+              description: Calculated patient identifier suffix
+            status:
+              type: integer
+              enum: [0, 1, 2, 4, 5, 10, 11, 12]
+              description: |
+                Patient status:
+                - 0: No Product
+                - 1: Submitted
+                - 2: Approved
+                - 4: Shipped
+                - 5: Add Plan
+                - 10: No Instruction
+                - 11: Suspended
+                - 12: Archived
+            submitted_at:
+              type: string
+              format: date-time
+              nullable: true
+            updated_at:
+              type: string
+              format: date-time
+              nullable: true
+            user:
+              type: integer
+              description: Associated user ID
+            doctor:
+              type: integer
+              nullable: true
+              description: Assigned doctor ID
+            sex:
+              type: integer
+              enum: [0, 1, 2]
+              nullable: true
+              description: |
+                Patient sex:
+                - 0: Undisclosed
+                - 1: Male
+                - 2: Female
+            birthdate:
+              type: string
+              format: date
+              nullable: true
+            office:
+              type: integer
+              nullable: true
+              description: Associated office ID
+            schemes:
+              type: object
+              description: Custom patient schemes data
+            suspended:
+              type: boolean
+              default: false
+            archived:
+              type: boolean
+              default: false
+
+        PatientCreate:
+          type: object
+          required:
+            - user
+          properties:
+            user:
+              type: integer
+              description: Associated user ID
+            doctor:
+              type: integer
+              nullable: true
+            sex:
+              type: integer
+              enum: [0, 1, 2]
+              nullable: true
+            birthdate:
+              type: string
+              format: date
+              nullable: true
+            office:
+              type: integer
+              nullable: true
+            schemes:
+              type: object
+              default: {}
+
+        PatientUpdate:
+          type: object
+          properties:
+            doctor:
+              type: integer
+              nullable: true
+            sex:
+              type: integer
+              enum: [0, 1, 2]
+              nullable: true
+            birthdate:
+              type: string
+              format: date
+              nullable: true
+            office:
+              type: integer
+              nullable: true
+            schemes:
+              type: object
+            suspended:
+              type: boolean
+            archived:
+              type: boolean
+
+        Instruction:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            patient:
+              type: integer
+              description: Patient ID
+            course:
+              type: integer
+              description: Course ID
+            order:
+              type: integer
+              default: 0
+            suffix:
+              type: string
+              readOnly: true
+            submitted_at:
+              type: string
+              format: date-time
+              nullable: true
+            updated_at:
+              type: string
+              format: date-time
+              nullable: true
+            status:
+              type: integer
+              enum: [0, 1, 2, 4, 5, 10, 11, 12]
+              nullable: true
+            model:
+              type: integer
+              enum: [1, 2, 3]
+              nullable: true
+              description: |
+                Model type:
+                - 1: STL
+                - 2: PVS
+                - 3: Scanner
+            scanner:
+              type: integer
+              enum: [1, 2, 10]
+              nullable: true
+              description: |
+                Scanner type:
+                - 1: 3Shape
+                - 2: iTero
+                - 10: Other
+            scanner_notes:
+              type: string
+              maxLength: 1000
+            comprehensive:
+              type: boolean
+              nullable: true
+            complaint:
+              type: string
+              maxLength: 500
+            objective:
+              type: string
+              maxLength: 500
+            notes:
+              type: string
+              maxLength: 6000
+              nullable: true
+            accept_extraction:
+              type: boolean
+              nullable: true
+            upper_jaw:
+              type: integer
+              nullable: true
+              description: Upper jaw configuration ID
+            lower_jaw:
+              type: integer
+              nullable: true
+              description: Lower jaw configuration ID
+            conditions:
+              type: object
+              description: Treatment conditions data
+            cbct:
+              type: boolean
+              nullable: true
+            price:
+              type: number
+              format: decimal
+              nullable: true
+            exports:
+              type: object
+              description: Export configuration data
+            deleted:
+              type: boolean
+              default: false
+
+        InstructionCreate:
+          type: object
+          required:
+            - patient
+            - course
+          properties:
+            patient:
+              type: integer
+            course:
+              type: integer
+            model:
+              type: integer
+              enum: [1, 2, 3]
+              nullable: true
+            scanner:
+              type: integer
+              enum: [1, 2, 10]
+              nullable: true
+            scanner_notes:
+              type: string
+              maxLength: 1000
+            comprehensive:
+              type: boolean
+              nullable: true
+              type: string
+              maxLength: 500
+            objective:
+              type: string
+              maxLength: 500
+            notes:
+              type: string
+              maxLength: 6000
+              nullable: true
+            accept_extraction:
+              type: boolean
+              nullable: true
+            conditions:
+              type: object
+              default: {}
+            cbct:
+              type: boolean
+              nullable: true
+            price:
+              type: number
+              format: decimal
+              nullable: true
+
+        Plan:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            instruction:
+              type: integer
+              description: Instruction ID
+            name:
+              type: string
+              maxLength: 100
+            number:
+              type: integer
+              nullable: true
+              description: Plan number (null for sandbox plans)
+            notes:
+              type: string
+              maxLength: 1600
+              nullable: true
+            original:
+              type: boolean
+              default: false
+              description: Whether this is the original treatment plan
+            project:
+              type: integer
+              description: Associated 3D project ID
+
+        Office:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            doctor:
+              type: integer
+              description: Primary doctor ID
+            name:
+              type: string
+              maxLength: 50
+              nullable: true
+            address:
+              type: string
+              maxLength: 250
+              nullable: true
+            apt:
+              type: string
+              maxLength: 24
+              nullable: true
+            city:
+              type: string
+              maxLength: 50
+              nullable: true
+            country:
+              type: string
+              maxLength: 50
+              nullable: true
+            state:
+              type: string
+              maxLength: 30
+              nullable: true
+            zip:
+              type: string
+              maxLength: 10
+              nullable: true
+            phone:
+              type: string
+              maxLength: 15
+              nullable: true
+            tax_rate:
+              type: number
+              format: decimal
+              default: 0
+            valid:
+              type: boolean
+              nullable: true
+            sq_customer_id:
+              type: string
+              maxLength: 191
+              description: SquareUp customer ID
+            emails:
+              type: boolean
+              default: false
+
+        User:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            username:
+              type: string
+              maxLength: 150
+            email:
+              type: string
+              format: email
+              maxLength: 254
+            first_name:
+              type: string
+              maxLength: 150
+            last_name:
+              type: string
+              maxLength: 150
+            is_active:
+              type: boolean
+              default: true
+            date_joined:
+              type: string
+              format: date-time
+              readOnly: true
+
+        Course:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            name:
+              type: string
+              maxLength: 20
+            type:
+              type: integer
+              enum: [1, 2, 3, 4, 5, 6]
+              nullable: true
+              description: |
+                Course type:
+                - 1: Main
+                - 2: Refinement
+                - 3: Any
+                - 4: Substitute
+                - 5: Invoice
+                - 6: Merchandise
+            customization:
+              type: object
+              description: Course-specific customization settings
+
+        Product:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            name:
+              type: string
+              maxLength: 50
+              nullable: true
+            description:
+              type: string
+              maxLength: 1000
+              nullable: true
+            type:
+              type: integer
+              enum: [1, 2, 3, 4, 5, 6, 7, 8, 100]
+              nullable: true
+              description: |
+                Product type:
+                - 1: Brava
+                - 2: Refinement Brava
+                - 3: Refinement Aligner
+                - 4: Substitute Brava+IDB
+                - 5: Aligner
+                - 6: Substitute Aligner
+                - 7: Substitute Brava
+                - 8: Substitute IDB
+                - 100: Invoice
+            course:
+              type: integer
+              description: Associated course ID
+            free:
+              type: boolean
+              default: false
+            substitute:
+              type: boolean
+              default: false
+            customization:
+              type: object
+              description: Product-specific customization settings
+            deleted:
+              type: boolean
+              default: false
+
+        File:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            instruction:
+              type: integer
+              nullable: true
+              description: Associated instruction ID
+            uid:
+              type: string
+              format: uuid
+              readOnly: true
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            name:
+              type: string
+              maxLength: 200
+              nullable: true
+            ext:
+              type: string
+              maxLength: 10
+              nullable: true
+            size:
+              type: integer
+              format: int64
+              default: 0
+            description:
+              type: string
+              maxLength: 200
+              nullable: true
+            parameters:
+              type: object
+              description: File-specific parameters
+            type:
+              type: integer
+              enum:
+                [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  30,
+                  31,
+                  32,
+                  35,
+                  36,
+                  40,
+                ]
+              default: 0
+              description: File type (0=Unknown, 1=Photo, 6=STL Upper, 7=STL Lower, etc.)
+            status:
+              type: integer
+              enum: [0, 1, 2, 3, 4, 5]
+              default: 0
+              description: |
+                File status:
+                - 0: Not Available
+                - 1: Not Needed
+                - 2: Need Convert
+                - 3: Converting
+                - 4: Converted
+                - 5: Convert Error
+
+        Task:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            instruction:
+              type: integer
+              nullable: true
+              description: Associated instruction ID
+            order:
+              type: integer
+              nullable: true
+              description: Associated order ID
+            template:
+              type: integer
+              description: Task template ID
+            jaw:
+              type: integer
+              enum: [1, 2, 3]
+              default: 1
+              description: |
+                Target jaw:
+                - 1: Both
+                - 2: Upper
+                - 3: Lower
+            actor:
+              type: integer
+              nullable: true
+              description: Assigned user ID
+            done_at:
+              type: string
+              format: date-time
+              nullable: true
+            checked:
+              type: boolean
+              default: false
+            file:
+              type: integer
+              nullable: true
+              description: Associated file ID
+            plan:
+              type: integer
+              nullable: true
+              description: Associated plan ID
+            text:
+              type: string
+              maxLength: 4000
+              nullable: true
+
+        Payment:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            instruction:
+              type: integer
+              nullable: true
+              description: Associated instruction ID
+            order:
+              type: integer
+              nullable: true
+              description: Associated order ID
+            doctor:
+              type: integer
+              nullable: true
+              description: Doctor ID
+            office:
+              type: integer
+              nullable: true
+              description: Office ID
+            made_at:
+              type: string
+              format: date-time
+              nullable: true
+            netsuite:
+              type: boolean
+              default: false
+            free:
+              type: boolean
+              default: false
+            canceled:
+              type: boolean
+              default: false
+            paid:
+              type: boolean
+              default: false
+            subtotal_price:
+              type: number
+              format: decimal
+              default: 0
+            custom_price:
+              type: number
+              format: decimal
+              nullable: true
+            used_credit:
+              type: number
+              format: decimal
+              default: 0
+            tax_rate:
+              type: number
+              format: decimal
+              default: 0
+            tax_value:
+              type: number
+              format: decimal
+              default: 0
+            additional_price:
+              type: number
+              format: decimal
+              default: 0
+            total_price:
+              type: number
+              format: decimal
+              default: 0
+            paid_price:
+              type: number
+              format: decimal
+              default: 0
+            installments:
+              type: object
+              description: Installment payment data
+
+        Record:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            target_type:
+              type: integer
+              nullable: true
+              description: Content type of target object
+            target_id:
+              type: integer
+              description: ID of target object
+            type:
+              type: integer
+              enum: [1, 2, 3, 4, 5, 6, 7, 8]
+              nullable: true
+              description: |
+                Record type:
+                - 1: Plan Comment
+                - 2: Plan Note
+                - 3: Doctor Message
+                - 4: Doctor Note
+                - 5: Course Message
+                - 6: Course Note
+                - 7: Course Sales Note
+                - 8: Course Comment
+            author:
+              type: integer
+              nullable: true
+              description: Author user ID
+            public:
+              type: boolean
+              nullable: true
+            group:
+              type: integer
+              nullable: true
+              description: Target group ID
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            text:
+              type: string
+              maxLength: 2048
+
+        Notification:
+          type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            created_at:
+              type: string
+              format: date-time
+              readOnly: true
+            sender:
+              type: string
+              maxLength: 254
+            recipient:
+              type: integer
+              description: Recipient user ID
+            template_name:
+              type: string
+              maxLength: 1023
+            template_context:
+              type: object
+              description: Notification template context data
+            read:
+              type: boolean
+              default: false
+            send:
+              type: boolean
+              default: true
+            sent:
+              type: boolean
+              nullable: true
+            item_type:
+              type: integer
+              nullable: true
+              description: Content type of related item
+            item_id:
+              type: integer
+              nullable: true
+              description: ID of related item
+
+    tags:
+      - name: Authentication
+        description: User authentication and session management
+      - name: Root
+        description: API root and discovery endpoints
+      - name: Patients
+        description: Patient management operations
+      - name: Instructions
+        description: Treatment instruction operations
+      - name: Treatment Plans
+        description: Treatment plan management
+      - name: Offices
+        description: Dental office management
+      - name: Users
+        description: User and staff management
+      - name: Courses
+        description: Treatment course definitions
+      - name: Products
+        description: Product and service catalog
+      - name: Files
+        description: File upload and management
+      - name: Tasks
+        description: Workflow task management
+      - name: Payments
+        description: Payment and billing operations
+      - name: Records
+        description: Communication and record management
+      - name: Notifications
+        description: System notification management
+
 # Example MCP Servers Object Structure
 # mcpServers:
 #   everything:
@@ -336,3 +1887,5 @@ endpoints:
 #     # instructions: "You are a memory management assistant. Store and manage user information accurately."
 #     # model_parameters:
 #     #   temperature: 0.1
+            complaint:
+              

@@ -2,16 +2,195 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "chrome",
+      "request": "launch",
+      "name": "🌐 Chrome: Launch LibreChat Frontend",
+      "url": "http://localhost:3080",
+      "webRoot": "${workspaceFolder}/client",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/client/node_modules/*",
+        "webpack:///./*": "${workspaceFolder}/client/*",
+        "webpack:///src/*": "${workspaceFolder}/client/src/*",
+        "webpack:///./src/*": "${workspaceFolder}/client/src/*"
+      },
+      "userDataDir": false,
+      "timeout": 30000,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "chrome",
+      "request": "attach",
+      "name": "🌐 Chrome: Attach to LibreChat Frontend",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/client",
+      "url": "http://localhost:3080",
+      "timeout": 30000,
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/client/node_modules/*",
+        "webpack:///./*": "${workspaceFolder}/client/*",
+        "webpack:///src/*": "${workspaceFolder}/client/src/*",
+        "webpack:///./src/*": "${workspaceFolder}/client/src/*"
+      }
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🔧 Node: Attach to LibreChat API (Docker)",
+      "preLaunchTask": "🐳 Start LibreChat Debug Environment",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "restart": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/api/dist/**/*.js"
+      ],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🔧 Node: Attach to LibreChat API (Running)",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "restart": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/api/dist/**/*.js"
+      ]
+    },
+    {
       "type": "node",
       "request": "launch",
-      "name": "Launch LibreChat (debug)",
-      "skipFiles": ["<node_internals>/**"],
+      "name": "🔧 Node: Launch LibreChat API (Local)",
       "program": "${workspaceFolder}/api/server/index.js",
+      "cwd": "${workspaceFolder}",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "development",
+        "DEBUG": "librechat:*",
+        "HOST": "0.0.0.0",
+        "PORT": "3080"
       },
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "${workspaceFolder}/api/dist/**/*.js"
+      ],
       "console": "integratedTerminal",
-      "envFile": "${workspaceFolder}/.env"
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🔧 Node: Debug Specific Test File",
+      "program": "${workspaceFolder}/api/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--config",
+        "jest.config.js",
+        "${file}"
+      ],
+      "cwd": "${workspaceFolder}/api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/api/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "type": "docker",
+      "request": "attach",
+      "name": "🐳 Docker: Attach to LibreChat Container",
+      "platform": "node",
+      "containerName": "LibreChat-Dev",
+      "sourceFileMap": {
+        "/app": "${workspaceFolder}"
+      },
+      "port": 9229,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🔧 Node: Attach to RAG API",
+      "port": 9230,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "restart": true,
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Full Stack Debug: Docker + Chrome",
+      "configurations": [
+        "🔧 Node: Attach to LibreChat API (Docker)",
+        "🌐 Chrome: Launch LibreChat Frontend"
+      ],
+      "preLaunchTask": "🐳 Start LibreChat Debug Environment",
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "full-stack"
+      }
+    },
+    {
+      "name": "🚀 Full Stack Debug: Attach to Running",
+      "configurations": [
+        "🔧 Node: Attach to LibreChat API (Running)",
+        "🌐 Chrome: Attach to LibreChat Frontend"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "full-stack"
+      }
+    },
+    {
+      "name": "🚀 API Services Debug: All Services",
+      "configurations": [
+        "🔧 Node: Attach to LibreChat API (Docker)",
+        "🔧 Node: Attach to RAG API"
+      ],
+      "preLaunchTask": "🐳 Start LibreChat Debug Environment",
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "services"
+      }
     }
   ]
 }

@@ -283,6 +283,7 @@ export type ToolCallResult = {
 export enum AuthTypeEnum {
   ServiceHttp = 'service_http',
   OAuth = 'oauth',
+  DjangoToken = 'django_token',
   None = 'none',
 }
 
@@ -324,6 +325,10 @@ export type ActionAuth = {
   client_url?: string;
   scope?: string;
   token_exchange_method?: TokenExchangeMethodEnum;
+  // Django token authentication fields
+  django_username?: string;
+  django_password?: string;
+  django_base_url?: string;
 };
 
 export type ActionMetadataRuntime = ActionMetadata & {

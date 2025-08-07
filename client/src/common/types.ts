@@ -165,6 +165,10 @@ export type ActionAuthForm = {
   client_url: string;
   scope: string;
   token_exchange_method: t.TokenExchangeMethodEnum;
+  /* Django Token */
+  django_username: string;
+  django_password: string;
+  django_base_url: string;
 };
 
 export type MCPForm = ActionAuthForm & {

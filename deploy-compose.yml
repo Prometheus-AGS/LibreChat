@@ -13,7 +13,7 @@ services:
       - rag_api
     restart: always
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     env_file:
       - .env
     environment:
@@ -67,9 +67,9 @@ services:
   vectordb:
     image: ankane/pgvector:latest
     environment:
-      POSTGRES_DB: mydatabase
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     restart: always
     volumes:
       - pgdata2:/var/lib/postgresql/data
