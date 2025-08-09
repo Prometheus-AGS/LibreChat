@@ -1,0 +1,233 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🐳 Start LibreChat Debug Environment",
+      "type": "shell",
+      "command": "npm run debug",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "npm",
+          "pattern": [
+            {
+              "regexp": "^(.*)$",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": ".*Debugger listening on ws://0.0.0.0:9229.*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "🐳 Start LibreChat with Frontend Dev",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.dev.yml --profile frontend-dev up --build",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "npm",
+          "pattern": [
+            {
+              "regexp": "^(.*)$",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": ".*(Debugger listening on ws://0.0.0.0:9229|Local:.*http://localhost:3000).*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "🐳 Stop LibreChat Debug Environment",
+      "type": "shell",
+      "command": "npm run debug:down",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🐳 View LibreChat Logs",
+      "type": "shell",
+      "command": "npm run debug:logs",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔧 Build LibreChat for Debugging",
+      "type": "shell",
+      "command": "npm run debug:build",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🌐 Start Frontend Dev Server",
+      "type": "shell",
+      "command": "cd client && npm run dev",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "npm",
+          "pattern": [
+            {
+              "regexp": "^(.*)$",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": ".*Local:.*http://localhost:3000.*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "🔧 Start Backend API (Local)",
+      "type": "shell",
+      "command": "cd api && npm run backend:dev",
+      "isBackground": true,
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": [
+        {
+          "owner": "npm",
+          "pattern": [
+            {
+              "regexp": "^(.*)$",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": ".*Server running on port.*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "🧪 Run API Tests",
+      "type": "shell",
+      "command": "cd api && npm test",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🧪 Run Client Tests",
+      "type": "shell",
+      "command": "cd client && npm test",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔍 Install Chrome Debug Extension",
+      "type": "shell",
+      "command": "echo 'Install the \"Debugger for Chrome\" extension from VS Code marketplace'",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📊 Check Docker Status",
+      "type": "shell",
+      "command": "docker ps --filter \"name=LibreChat\" --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\"",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🔄 Restart LibreChat API",
+      "type": "shell",
+      "command": "docker restart LibreChat-Dev",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🗑️ Clean Docker Environment",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

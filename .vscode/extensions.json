@@ -1,0 +1,83 @@
+{
+  "recommendations": [
+    // Essential debugging extensions
+    "ms-vscode.vscode-js-debug",
+    "ms-vscode.js-debug-nightly",
+    
+    // Docker support
+    "ms-azuretools.vscode-docker",
+    
+    // Language support
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    
+    // React development
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    
+    // Code quality
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "streetsidesoftware.code-spell-checker",
+    
+    // Git integration
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    
+    // Productivity
+    "ms-vscode.vscode-npm-script",
+    "christian-kohler.npm-intellisense",
+    "ms-vscode.vscode-node-azure-pack",
+    
+    // Database tools
+    "mongodb.mongodb-vscode",
+    "ms-ossdata.vscode-postgresql",
+    
+    // Environment files
+    "mikestead.dotenv",
+    
+    // YAML support
+    "redhat.vscode-yaml",
+    
+    // Markdown support
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    
+    // REST client for API testing
+    "humao.rest-client",
+    
+    // Thunder Client for API testing (alternative)
+    "rangav.vscode-thunder-client",
+    
+    // Bracket pair colorization
+    "coenraads.bracket-pair-colorizer-2",
+    
+    // Auto close tag
+    "formulahendry.auto-close-tag",
+    
+    // Better comments
+    "aaron-bond.better-comments",
+    
+    // Error lens for inline error display
+    "usernamehw.errorlens",
+    
+    // Import cost to see bundle impact
+    "wix.vscode-import-cost",
+    
+    // Console ninja for better console debugging
+    "wallabyjs.console-ninja",
+    
+    // Live server for static file serving
+    "ritwickdey.liveserver",
+    
+    // Peacock for workspace identification
+    "johnpapa.vscode-peacock"
+  ],
+  "unwantedRecommendations": [
+    // Extensions that might conflict with our setup
+    "ms-vscode.vscode-chrome-debug",
+    "msjsdiag.debugger-for-chrome"
+  ]
+}
