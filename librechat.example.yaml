@@ -1715,6 +1715,15 @@ brius:
 #       - -y
 #       - "mcp-obsidian"
 #       - /path/to/obsidian/vault
+#   supabase_brius:
+#     type: stdio
+#     command: npx
+#     args:
+#       - -y
+#       - "@supabase/mcp-server-supabase@latest"
+#       - "--project-ref=vbcdbpkztpdrxpikzwbj"
+#     env:
+#       SUPABASE_ACCESS_TOKEN: "sbp_74147f9923c8cc2580e51a89e761df9b43839cbe"
 
 # Definition of custom endpoints
 endpoints:

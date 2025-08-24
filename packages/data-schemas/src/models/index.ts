@@ -21,6 +21,8 @@ import { createConversationTagModel } from './conversationTag';
 import { createSharedLinkModel } from './sharedLink';
 import { createToolCallModel } from './toolCall';
 import { createMemoryModel } from './memory';
+import { createArtifactConfigModel } from './artifactConfig';
+import { createSupabaseToolModel } from './supabaseTool';
 
 /**
  * Creates all database models for all collections
@@ -50,5 +52,7 @@ export function createModels(mongoose: typeof import('mongoose')) {
     SharedLink: createSharedLinkModel(mongoose),
     ToolCall: createToolCallModel(mongoose),
     MemoryEntry: createMemoryModel(mongoose),
+    ArtifactConfig: createArtifactConfigModel(mongoose),
+    SupabaseTool: createSupabaseToolModel(mongoose),
   };
 }

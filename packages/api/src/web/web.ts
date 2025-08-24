@@ -83,7 +83,7 @@ export function getWebSearchKeys(): TWebSearchKeys[] {
 
   // Iterate through each category (providers, scrapers, rerankers)
   for (const category of Object.keys(webSearchAuth)) {
-    const categoryObj = webSearchAuth[category as TWebSearchCategories];
+    const categoryObj = webSearchAuth[category as keyof typeof webSearchAuth];
 
     // Iterate through each service within the category
     for (const service of Object.keys(categoryObj)) {
@@ -165,34 +165,35 @@ export async function loadWebSearchAuth({
   const authResult: Partial<TWebSearchConfig> = {};
 
   /** Type-safe iterator for the category-service combinations */
-  async function checkAuth<C extends TWebSearchCategories>(
-    category: C,
-  ): Promise<[boolean, boolean]> {
-    type ServiceType = keyof (typeof webSearchAuth)[C];
+  async function checkAuth(category: TWebSearchCategories): Promise<[boolean, boolean]> {
     let isUserProvided = false;
 
     // Check if a specific service is specified in the config
-    let specificService: ServiceType | undefined;
+    let specificService: string | undefined;
     if (category === SearchCategories.PROVIDERS && webSearchConfig?.searchProvider) {
-      specificService = webSearchConfig.searchProvider as unknown as ServiceType;
+      specificService = webSearchConfig.searchProvider;
     } else if (category === SearchCategories.SCRAPERS && webSearchConfig?.scraperType) {
-      specificService = webSearchConfig.scraperType as unknown as ServiceType;
+      specificService = webSearchConfig.scraperType;
     } else if (category === SearchCategories.RERANKERS && webSearchConfig?.rerankerType) {
-      specificService = webSearchConfig.rerankerType as unknown as ServiceType;
+      specificService = webSearchConfig.rerankerType;
     }
 
+    // Get the category configuration
+    const categoryConfig = webSearchAuth[category as keyof typeof webSearchAuth];
+
     // If a specific service is specified, only check that one
-    const services = specificService
-      ? [specificService]
-      : (Object.keys(webSearchAuth[category]) as ServiceType[]);
+    const services = specificService ? [specificService] : Object.keys(categoryConfig);
 
     for (const service of services) {
       // Skip if the service doesn't exist in the webSearchAuth config
-      if (!webSearchAuth[category][service]) {
+      if (!categoryConfig[service as keyof typeof categoryConfig]) {
         continue;
       }
 
-      const serviceConfig = webSearchAuth[category][service];
+      const serviceConfig = categoryConfig[service as keyof typeof categoryConfig] as Record<
+        string,
+        number
+      >;
 
       // Split keys into required and optional
       const requiredKeys: TWebSearchKeys[] = [];
@@ -200,9 +201,9 @@ export async function loadWebSearchAuth({
 
       for (const key in serviceConfig) {
         const typedKey = key as TWebSearchKeys;
-        if (serviceConfig[typedKey as keyof typeof serviceConfig] === 1) {
+        if (serviceConfig[typedKey] === 1) {
           requiredKeys.push(typedKey);
-        } else if (serviceConfig[typedKey as keyof typeof serviceConfig] === 0) {
+        } else if (serviceConfig[typedKey] === 0) {
           optionalKeys.push(typedKey);
         }
       }

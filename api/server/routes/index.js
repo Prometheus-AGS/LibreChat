@@ -26,6 +26,8 @@ const edit = require('./edit');
 const keys = require('./keys');
 const user = require('./user');
 const mcp = require('./mcp');
+const artifacts = require('./artifacts');
+// const supabaseConnection = require('./supabaseConnection'); // Temporarily disabled
 
 module.exports = {
   edit,
@@ -56,4 +58,6 @@ module.exports = {
   categories,
   staticRoute,
   mcp,
+  artifacts,
+  // supabaseConnection, // Temporarily disabled
 };

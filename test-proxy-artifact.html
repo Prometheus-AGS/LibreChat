@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibreChat Proxy Test Artifact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Mock the LibreChat proxy configuration for testing
+        window.__LIBRECHAT_PROXY_CONFIG__ = {
+            enabled: true,
+            endpoint: '/api/artifacts/proxy',
+            token: 'test-token'
+        };
+    </script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">LibreChat Proxy Test Suite</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Proxy Status</h2>
+            <div id="proxy-status" class="mb-4"></div>
+            <button onclick="checkProxyStatus()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Check Proxy Status
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="test-results" class="space-y-4"></div>
+            <button onclick="runAllTests()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mr-2">
+                Run All Tests
+            </button>
+            <button onclick="clearResults()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Clear Results
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Manual Test</h2>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">URL:</label>
+                <input type="text" id="manual-url" value="https://jsonplaceholder.typicode.com/posts/1" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Method:</label>
+                <select id="manual-method" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Headers (JSON):</label>
+                <textarea id="manual-headers" rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder='{"Content-Type": "application/json"}'></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Body (for POST/PUT):</label>
+                <textarea id="manual-body" rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder='{"title": "test", "body": "test content"}'></textarea>
+            </div>
+            <button onclick="runManualTest()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                Run Manual Test
+            </button>
+            <div id="manual-result" class="mt-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Include the proxy utility functions (normally injected by LibreChat)
+        async function proxyFetch(url, options = {}) {
+            const config = window.__LIBRECHAT_PROXY_CONFIG__;
+            
+            if (!config || !config.enabled) {
+                console.warn('LibreChat proxy is not enabled, falling back to regular fetch');
+                return fetch(url, options);
+            }
+
+            const targetUrl = url.toString();
+            
+            const proxyOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(config.token && { 'Authorization': `Bearer ${config.token}` }),
+                },
+                body: JSON.stringify({
+                    url: targetUrl,
+                    method: options.method || 'GET',
+                    headers: options.headers || {},
+                    body: options.body,
+                }),
+            };
+
+            try {
+                const proxyResponse = await fetch(config.endpoint, proxyOptions);
+                
+                if (!proxyResponse.ok) {
+                    throw new Error(`Proxy request failed: ${proxyResponse.status} ${proxyResponse.statusText}`);
+                }
+
+                const proxyData = await proxyResponse.json();
+                
+                if (!proxyData.success) {
+                    throw new Error(`External request failed: ${proxyData.error || 'Unknown error'}`);
+                }
+
+                const responseInit = {
+                    status: proxyData.status,
+                    statusText: proxyData.statusText,
+                    headers: new Headers(proxyData.headers),
+                };
+
+                let responseBody;
+                
+                if (proxyData.encoding === 'base64') {
+                    const binaryString = atob(proxyData.data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    responseBody = bytes.buffer;
+                } else if (typeof proxyData.data === 'object') {
+                    responseBody = JSON.stringify(proxyData.data);
+                } else {
+                    responseBody = proxyData.data;
+                }
+
+                return new Response(responseBody, responseInit);
+                
+            } catch (error) {
+                console.error('ProxyFetch error:', error);
+                throw error;
+            }
+        }
+
+        function isProxyAvailable() {
+            const config = window.__LIBRECHAT_PROXY_CONFIG__;
+            return !!(config && config.enabled && config.endpoint);
+        }
+
+        function getProxyStatus() {
+            const config = window.__LIBRECHAT_PROXY_CONFIG__;
+            return {
+                enabled: config?.enabled || false,
+                endpoint: config?.endpoint || null,
+                hasToken: !!(config?.token),
+            };
+        }
+
+        // Test functions
+        function checkProxyStatus() {
+            const status = getProxyStatus();
+            const statusDiv = document.getElementById('proxy-status');
+            
+            statusDiv.innerHTML = `
+                <div class="p-4 rounded-md ${status.enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    <h3 class="font-semibold">Proxy Status: ${status.enabled ? 'Enabled' : 'Disabled'}</h3>
+                    <p>Endpoint: ${status.endpoint || 'Not configured'}</p>
+                    <p>Has Token: ${status.hasToken ? 'Yes' : 'No'}</p>
+                    <p>Available: ${isProxyAvailable() ? 'Yes' : 'No'}</p>
+                </div>
+            `;
+        }
+
+        function addTestResult(testName, success, message, data = null) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `p-4 rounded-md ${success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            
+            let content = `
+                <h4 class="font-semibold">${testName}: ${success ? 'PASS' : 'FAIL'}</h4>
+                <p>${message}</p>
+            `;
+            
+            if (data) {
+                content += `<details class="mt-2"><summary class="cursor-pointer">View Data</summary><pre class="mt-2 text-xs overflow-auto">${JSON.stringify(data, null, 2)}</pre></details>`;
+            }
+            
+            resultDiv.innerHTML = content;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function testGetRequest() {
+            try {
+                const response = await proxyFetch('https://jsonplaceholder.typicode.com/posts/1');
+                const data = await response.json();
+                
+                if (response.ok && data.id === 1) {
+                    addTestResult('GET Request', true, 'Successfully fetched post data', data);
+                } else {
+                    addTestResult('GET Request', false, `Unexpected response: ${response.status}`);
+                }
+            } catch (error) {
+                addTestResult('GET Request', false, `Error: ${error.message}`);
+            }
+        }
+
+        async function testPostRequest() {
+            try {
+                const postData = {
+                    title: 'Test Post',
+                    body: 'This is a test post created via proxy',
+                    userId: 1
+                };
+                
+                const response = await proxyFetch('https://jsonplaceholder.typicode.com/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(postData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.title === postData.title) {
+                    addTestResult('POST Request', true, 'Successfully created post via proxy', data);
+                } else {
+                    addTestResult('POST Request', false, `Unexpected response: ${response.status}`);
+                }
+            } catch (error) {
+                addTestResult('POST Request', false, `Error: ${error.message}`);
+            }
+        }
+
+        async function testCorsBlockedSite() {
+            try {
+                // Test a site that typically blocks CORS
+                const response = await proxyFetch('https://httpbin.org/get');
+                const data = await response.json();
+                
+                if (response.ok && data.url) {
+                    addTestResult('CORS Bypass Test', true, 'Successfully bypassed CORS restrictions', data);
+                } else {
+                    addTestResult('CORS Bypass Test', false, `Unexpected response: ${response.status}`);
+                }
+            } catch (error) {
+                addTestResult('CORS Bypass Test', false, `Error: ${error.message}`);
+            }
+        }
+
+        async function testCustomHeaders() {
+            try {
+                const response = await proxyFetch('https://httpbin.org/headers', {
+                    method: 'GET',
+                    headers: {
+                        'X-Custom-Header': 'LibreChat-Proxy-Test',
+                        'User-Agent': 'LibreChat-Artifact/1.0'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.headers['X-Custom-Header']) {
+                    addTestResult('Custom Headers Test', true, 'Successfully sent custom headers', data);
+                } else {
+                    addTestResult('Custom Headers Test', false, 'Custom headers not found in response');
+                }
+            } catch (error) {
+                addTestResult('Custom Headers Test', false, `Error: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addTestResult('Test Suite', true, 'Starting automated tests...');
+            
+            await testGetRequest();
+            await testPostRequest();
+            await testCorsBlockedSite();
+            await testCustomHeaders();
+            
+            addTestResult('Test Suite', true, 'All automated tests completed!');
+        }
+
+        async function runManualTest() {
+            const url = document.getElementById('manual-url').value;
+            const method = document.getElementById('manual-method').value;
+            const headersText = document.getElementById('manual-headers').value;
+            const bodyText = document.getElementById('manual-body').value;
+            const resultDiv = document.getElementById('manual-result');
+            
+            try {
+                let headers = {};
+                if (headersText.trim()) {
+                    headers = JSON.parse(headersText);
+                }
+                
+                const options = {
+                    method: method,
+                    headers: headers
+                };
+                
+                if (bodyText.trim() && ['POST', 'PUT', 'PATCH'].includes(method)) {
+                    options.body = bodyText;
+                }
+                
+                const response = await proxyFetch(url, options);
+                const data = await response.text();
+                
+                resultDiv.innerHTML = `
+                    <div class="p-4 rounded-md ${response.ok ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                        <h4 class="font-semibold">Manual Test Result: ${response.ok ? 'SUCCESS' : 'FAILED'}</h4>
+                        <p>Status: ${response.status} ${response.statusText}</p>
+                        <details class="mt-2">
+                            <summary class="cursor-pointer">View Response</summary>
+                            <pre class="mt-2 text-xs overflow-auto max-h-64">${data}</pre>
+                        </details>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="p-4 rounded-md bg-red-100 text-red-800">
+                        <h4 class="font-semibold">Manual Test Result: ERROR</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkProxyStatus();
+        });
+    </script>
+</body>
+</html>

@@ -6,6 +6,7 @@ export * from './schemas';
 export * from './file-config';
 /* artifacts  */
 export * from './artifacts';
+export * from './artifact-registry';
 /* schema helpers  */
 export * from './parsers';
 export * from './ocr';

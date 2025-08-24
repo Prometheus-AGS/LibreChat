@@ -17,6 +17,7 @@ export { default as promptGroupSchema } from './promptGroup';
 export { default as roleSchema } from './role';
 export { default as sessionSchema } from './session';
 export { default as shareSchema } from './share';
+export { default as supabaseToolSchema } from './supabaseTool';
 export { default as tokenSchema } from './token';
 export { default as toolCallSchema } from './toolCall';
 export { default as transactionSchema } from './transaction';

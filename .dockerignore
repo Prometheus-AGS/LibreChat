@@ -13,5 +13,18 @@ librechat*
 Dockerfile*
 docs
 
-# Ignore all hidden files
-.*
+# Ignore specific hidden files and directories
+.git
+.gitignore
+.gitattributes
+.DS_Store
+.vscode
+.idea
+.editorconfig
+.eslintrc*
+.prettierrc*
+.dockerignore
+.circleci
+
+# Allow .env files for Docker builds
+!.env*

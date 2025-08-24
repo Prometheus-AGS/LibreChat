@@ -52,29 +52,31 @@ const fileFormat = winston.format.combine(
 );
 
 const transports = [
-  new winston.transports.DailyRotateFile({
-    level: 'error',
-    filename: `${logDir}/error-%DATE%.log`,
-    datePattern: 'YYYY-MM-DD',
-    zippedArchive: true,
-    maxSize: '20m',
-    maxFiles: '14d',
-    format: fileFormat,
-  }),
+  // Temporarily disabled file logging to prevent permission issues with Docker volumes
+  // new winston.transports.DailyRotateFile({
+  //   level: 'error',
+  //   filename: `${logDir}/error-%DATE%.log`,
+  //   datePattern: 'YYYY-MM-DD',
+  //   zippedArchive: true,
+  //   maxSize: '20m',
+  //   maxFiles: '14d',
+  //   format: fileFormat,
+  // }),
 ];
 
 if (useDebugLogging) {
-  transports.push(
-    new winston.transports.DailyRotateFile({
-      level: 'debug',
-      filename: `${logDir}/debug-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: winston.format.combine(fileFormat, debugTraverse),
-    }),
-  );
+  // Temporarily disabled debug file logging to prevent permission issues with Docker volumes
+  // transports.push(
+  //   new winston.transports.DailyRotateFile({
+  //     level: 'debug',
+  //     filename: `${logDir}/debug-%DATE%.log`,
+  //     datePattern: 'YYYY-MM-DD',
+  //     zippedArchive: true,
+  //     maxSize: '20m',
+  //     maxFiles: '14d',
+  //     format: winston.format.combine(fileFormat, debugTraverse),
+  //   }),
+  // );
 }
 
 const consoleFormat = winston.format.combine(

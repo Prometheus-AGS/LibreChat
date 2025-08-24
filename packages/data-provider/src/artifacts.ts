@@ -3045,6 +3045,254 @@ function useToast() {
 export { useToast, toast }
 `;
 
+// Import canary components from the component registry
+import { canaryComponents } from './component-registry';
+
+// Canary Components - Full implementations from component registry
+const sidebar = canaryComponents.sidebar;
+const command = canaryComponents.command;
+const chart = canaryComponents.chart;
+
+// Enhanced Breadcrumb Navigation Component - Canary (Full Implementation)
+const breadcrumbNav = `import * as React from "react"
+import { ChevronRight, MoreHorizontal, Home, ChevronDown } from "lucide-react"
+import { Slot } from "@radix-ui/react-slot"
+
+import { cn } from "/lib/utils"
+import { Button } from "./button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip"
+
+export interface BreadcrumbItem {
+  label: string
+  href?: string
+  icon?: React.ReactNode
+  onClick?: () => void
+  disabled?: boolean
+  dropdown?: Array<{
+    label: string
+    href?: string
+    onClick?: () => void
+    icon?: React.ReactNode
+  }>
+}
+
+const BreadcrumbNav = React.forwardRef<
+  HTMLElement,
+  React.ComponentProps<"nav"> & {
+    items: BreadcrumbItem[]
+    separator?: React.ReactNode
+    maxItems?: number
+    showHome?: boolean
+    homeHref?: string
+    onHomeClick?: () => void
+  }
+>(({
+  className,
+  items,
+  separator = <ChevronRight className="h-4 w-4" />,
+  maxItems = 3,
+  showHome = true,
+  homeHref = "/",
+  onHomeClick,
+  ...props
+}, ref) => {
+  const displayItems = React.useMemo(() => {
+    if (items.length <= maxItems) {
+      return items
+    }
+
+    const firstItem = items[0]
+    const lastItems = items.slice(-(maxItems - 1))
+    const collapsedItems = items.slice(1, -(maxItems - 1))
+
+    return [
+      firstItem,
+      {
+        label: "...",
+        dropdown: collapsedItems
+      } as BreadcrumbItem,
+      ...lastItems
+    ]
+  }, [items, maxItems])
+
+  return (
+    <nav
+      ref={ref}
+      aria-label="breadcrumb"
+      className={cn("flex items-center space-x-1 text-sm text-muted-foreground", className)}
+      {...props}
+    >
+      {showHome && (
+        <>
+          <BreadcrumbItem
+            item={{
+              label: "Home",
+              href: homeHref,
+              onClick: onHomeClick,
+              icon: <Home className="h-4 w-4" />
+            }}
+          />
+          {items.length > 0 && (
+            <span className="flex items-center text-muted-foreground/50">
+              {separator}
+            </span>
+          )}
+        </>
+      )}
+      
+      {displayItems.map((item, index) => (
+        <React.Fragment key={index}>
+          <BreadcrumbItem item={item} />
+          {index < displayItems.length - 1 && (
+            <span className="flex items-center text-muted-foreground/50">
+              {separator}
+            </span>
+          )}
+        </React.Fragment>
+      ))}
+    </nav>
+  )
+})
+BreadcrumbNav.displayName = "BreadcrumbNav"
+
+const BreadcrumbItem = React.forwardRef<
+  HTMLSpanElement,
+  React.ComponentProps<"span"> & {
+    item: BreadcrumbItem
+  }
+>(({ className, item, ...props }, ref) => {
+  const isLast = !item.href && !item.onClick
+  const hasDropdown = item.dropdown && item.dropdown.length > 0
+
+  if (hasDropdown) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto p-1 text-muted-foreground hover:text-foreground"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+            <ChevronDown className="h-3 w-3 ml-1" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {item.dropdown.map((dropdownItem, index) => (
+            <DropdownMenuItem
+              key={index}
+              onClick={dropdownItem.onClick}
+              disabled={!dropdownItem.href && !dropdownItem.onClick}
+              className="flex items-center gap-2"
+            >
+              {dropdownItem.icon}
+              {dropdownItem.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
+  if (item.label === "...") {
+    return (
+      <span
+        ref={ref}
+        className={cn("flex items-center", className)}
+        {...props}
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </span>
+    )
+  }
+
+  const content = (
+    <span className="flex items-center gap-1">
+      {item.icon}
+      <span className="truncate max-w-[200px]">{item.label}</span>
+    </span>
+  )
+
+  if (isLast || item.disabled) {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          "flex items-center font-medium text-foreground",
+          item.disabled && "opacity-50",
+          className
+        )}
+        {...props}
+      >
+        {content}
+      </span>
+    )
+  }
+
+  if (item.onClick) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={item.onClick}
+            className="h-auto p-1 text-muted-foreground hover:text-foreground"
+          >
+            {content}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Navigate to {item.label}</p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <a
+          href={item.href}
+          className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {content}
+        </a>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Navigate to {item.label}</p>
+      </TooltipContent>
+    </Tooltip>
+  )
+})
+BreadcrumbItem.displayName = "BreadcrumbItem"
+
+export { BreadcrumbNav }
+`;
+
+// Import navigation examples
+import {
+  basicSidebarExample,
+  collapsibleSidebarExample,
+  mobileSidebarExample,
+  keyboardSidebarExample,
+  advancedSidebarExample,
+} from './navigation-examples';
+import {
+  basicBreadcrumbExample,
+  dropdownBreadcrumbExample,
+  dynamicBreadcrumbExample,
+  responsiveBreadcrumbExample,
+} from './breadcrumb-examples';
+import {
+  dashboardLayoutExample,
+  adminPanelExample,
+  multiLevelNavigationExample,
+} from './combined-navigation-examples';
+import { commandPaletteExamples } from './command-palette-examples';
+import { chartExamples } from './chart-examples';
+
 export const shadcnComponents = {
   utils: utils,
   accordian: accordian,
@@ -3085,6 +3333,39 @@ export const shadcnComponents = {
   toggle: toggle,
   tooltip: tooltip,
   useToast: useToast,
+  // Canary Components
+  sidebar: sidebar,
+  command: command,
+  breadcrumbNav: breadcrumbNav,
+  chart: chart,
+
+  // Navigation Examples
+  basicSidebarExample: basicSidebarExample,
+  collapsibleSidebarExample: collapsibleSidebarExample,
+  mobileSidebarExample: mobileSidebarExample,
+  keyboardSidebarExample: keyboardSidebarExample,
+  advancedSidebarExample: advancedSidebarExample,
+
+  // Breadcrumb Examples
+  basicBreadcrumbExample: basicBreadcrumbExample,
+  dropdownBreadcrumbExample: dropdownBreadcrumbExample,
+  dynamicBreadcrumbExample: dynamicBreadcrumbExample,
+  responsiveBreadcrumbExample: responsiveBreadcrumbExample,
+
+  // Combined Navigation Examples
+  dashboardLayoutExample: dashboardLayoutExample,
+  adminPanelExample: adminPanelExample,
+  multiLevelNavigationExample: multiLevelNavigationExample,
+
+  // Command Palette Examples
+  basicCommandPalette: commandPaletteExamples.basicCommandPalette.code,
+  advancedCommandPalette: commandPaletteExamples.advancedCommandPalette.code,
+  searchCommandPalette: commandPaletteExamples.searchCommandPalette.code,
+
+  // Chart Examples
+  basicLineChart: chartExamples.basicLineChart.code,
+  interactiveBarChart: chartExamples.interactiveBarChart.code,
+  dashboardCharts: chartExamples.dashboardCharts.code,
 };
 
 export const essentialShadcnComponents = {

@@ -21,7 +21,7 @@ const TestComponent = () => {
 };
 
 export default TestComponent;
-        `
+        `,
       };
 
       const result = await validator.validate(artifact);
@@ -44,7 +44,7 @@ import React from 'react';
 const InvalidComponent = () => {
   return <div>Hello World</div>
   // Missing closing brace
-        `
+        `,
       };
 
       const result = await validator.validate(artifact);
@@ -81,7 +81,7 @@ const HooksComponent = () => {
 };
 
 export default HooksComponent;
-        `
+        `,
       };
 
       const result = await validator.validate(artifact);
@@ -116,7 +116,7 @@ const TypeScriptComponent: React.FC<Props> = ({ name, age }) => {
 };
 
 export default TypeScriptComponent;
-        `
+        `,
       };
 
       const result = await validator.validate(artifact);
@@ -133,7 +133,7 @@ export default TypeScriptComponent;
         identifier: 'empty-component',
         type: 'application/vnd.react',
         title: 'Empty Component',
-        content: ''
+        content: '',
       };
 
       const result = await validator.validate(artifact);
@@ -160,8 +160,8 @@ const NestedComponent = () => {
 };
 
 export default NestedComponent;
-          `
-        }
+          `,
+        },
       };
 
       const result = await validator.validate(artifact);
@@ -177,7 +177,7 @@ export default NestedComponent;
   describe('extractCode', () => {
     test('should extract code from artifact.content string', () => {
       const artifact = {
-        content: 'const test = "hello";'
+        content: 'const test = "hello";',
       };
 
       const code = validator.extractCode(artifact);
@@ -186,7 +186,7 @@ export default NestedComponent;
 
     test('should extract code from artifact.code', () => {
       const artifact = {
-        code: 'const test = "hello";'
+        code: 'const test = "hello";',
       };
 
       const code = validator.extractCode(artifact);
@@ -196,8 +196,8 @@ export default NestedComponent;
     test('should extract code from nested content structure', () => {
       const artifact = {
         content: {
-          code: 'const test = "hello";'
-        }
+          code: 'const test = "hello";',
+        },
       };
 
       const code = validator.extractCode(artifact);
@@ -206,7 +206,7 @@ export default NestedComponent;
 
     test('should return null when no code is found', () => {
       const artifact = {
-        content: {}
+        content: {},
       };
 
       const code = validator.extractCode(artifact);
@@ -234,7 +234,7 @@ export default NestedComponent;
     test('should reset validation statistics', () => {
       // Perform some validation to change stats
       validator.resetStats();
-      
+
       const stats = validator.getStats();
       expect(stats.validationsAttempted).toBe(0);
       expect(stats.validationsSucceeded).toBe(0);

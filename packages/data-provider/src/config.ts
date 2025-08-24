@@ -486,6 +486,22 @@ const termsOfServiceSchema = z.object({
 
 export type TTermsOfService = z.infer<typeof termsOfServiceSchema>;
 
+const supabaseConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  url: z.string().url().optional(),
+  anonKey: z.string().optional(),
+  serviceKey: z.string().optional(),
+});
+
+export type TSupabaseConfig = z.infer<typeof supabaseConfigSchema>;
+
+const artifactsConfigSchema = z.object({
+  supabase: supabaseConfigSchema.optional(),
+  zustandEnabled: z.boolean().default(true),
+});
+
+export type TArtifactsConfig = z.infer<typeof artifactsConfigSchema>;
+
 const mcpServersSchema = z.object({
   placeholder: z.string().optional(),
 });
@@ -518,6 +534,7 @@ export const intefaceSchema = z
     runCode: z.boolean().optional(),
     webSearch: z.boolean().optional(),
     fileSearch: z.boolean().optional(),
+    artifacts: artifactsConfigSchema.optional(),
   })
   .default({
     endpointsMenu: true,
@@ -618,6 +635,7 @@ export type TStartupConfig = {
     }
   >;
   mcpPlaceholder?: string;
+  artifacts?: TArtifactsConfig;
 };
 
 export enum OCRStrategy {

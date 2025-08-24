@@ -7,6 +7,13 @@ data/
 logs
 *.log
 
+# Docker volumes (should not be tracked)
+librechat_logs/
+librechat_images/
+librechat_uploads/
+librechat_mongodb_data/
+librechat_meili_data/
+
 # Runtime data
 pids
 *.pid
@@ -116,6 +123,9 @@ auth.json
 # User uploads
 uploads/
 
+# Backup directories
+backup/
+
 # owner
 release/
 
@@ -137,3 +147,42 @@ helm/**/.values.yaml
 /.openai/
 /.tabnine/
 /.codeium
+
+# Temporary files and caches
+*.tmp
+*.temp
+.cache/
+.npm/
+.yarn/
+.pnpm-store/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
+._*
+
+# Editor and IDE files
+*.swp
+*.swo
+*~
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/.ropeproject
+*.sublime-project
+*.sublime-workspace
+
+# Security and sensitive files
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+secrets.json
+credentials.json
+service-account*.json

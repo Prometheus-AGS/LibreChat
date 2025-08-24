@@ -1,0 +1,30 @@
+{
+  "scripts": {
+    "artifact:init": "node scripts/artifact-cli.js init",
+    "artifact:list": "node scripts/artifact-cli.js list",
+    "artifact:search": "node scripts/artifact-cli.js search",
+    "artifact:create": "node scripts/artifact-cli.js create",
+    "artifact:get": "node scripts/artifact-cli.js get",
+    "artifact:delete": "node scripts/artifact-cli.js delete",
+    "artifact:status": "node scripts/artifact-cli.js status",
+    "artifact:templates": "node scripts/artifact-cli.js templates",
+    "artifact:validate": "node scripts/dev-tools/artifact-validator.js",
+    "artifact:test": "npm run test:client -- --testPathPattern=Artifact",
+    "artifact:test:api": "npm run test:api -- --testPathPattern=artifacts",
+    "artifact:test:e2e": "npm run e2e -- artifact-registry.spec.ts",
+    "artifact:test:performance": "npm run test:client -- --testPathPattern=performance/Artifact",
+    "artifact:test:all": "npm run artifact:test && npm run artifact:test:api && npm run artifact:test:e2e",
+    "artifact:dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\" --names \"API,CLIENT\" --prefix-colors \"blue,green\"",
+    "artifact:build": "npm run build:data-provider && npm run build:data-schemas && npm run build:api && npm run build:client",
+    "artifact:lint": "eslint \"client/src/components/Artifacts/**/*.{ts,tsx}\" \"client/src/store/artifact-registry.ts\" \"api/server/controllers/artifactRegistry.js\" \"api/server/routes/artifacts.js\"",
+    "artifact:lint:fix": "npm run artifact:lint -- --fix",
+    "artifact:format": "prettier --write \"client/src/components/Artifacts/**/*.{ts,tsx}\" \"client/src/store/artifact-registry.ts\" \"api/server/controllers/artifactRegistry.js\" \"api/server/routes/artifacts.js\"",
+    "artifact:docs": "echo 'Opening artifact registry documentation...' && open docs/development/artifact-registry-developer-guide.md",
+    "artifact:setup": "npm run artifact:init && npm run artifact:templates && echo 'Artifact registry setup complete!'",
+    "artifact:clean": "rm -rf .artifact-registry.json && rm -rf templates/artifacts && echo 'Artifact registry cleaned'",
+    "artifact:health": "node -e \"console.log('🏥 Artifact Registry Health Check'); require('./scripts/health-check.js').checkArtifactRegistry()\"",
+    "artifact:migrate": "node scripts/migrate-artifacts.js",
+    "artifact:backup": "node scripts/backup-artifacts.js",
+    "artifact:restore": "node scripts/restore-artifacts.js"
+  }
+}

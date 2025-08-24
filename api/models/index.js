@@ -22,6 +22,7 @@ const {
 } = require('./Message');
 const { getConvoTitle, getConvo, saveConvo, deleteConvos } = require('./Conversation');
 const { getPreset, getPresets, savePreset, deletePresets } = require('./Preset');
+// const SupabaseTool = require('./SupabaseTool');
 
 module.exports = {
   ...methods,
@@ -51,4 +52,6 @@ module.exports = {
   getPresets,
   savePreset,
   deletePresets,
+
+  // SupabaseTool,
 };
